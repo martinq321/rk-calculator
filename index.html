@@ -1,20 +1,176 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Almost-prime R functions | Numerical explorer</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Almost-prime R functions | Numerical calculator</title>
 <style>
-:root{--ink:#182938;--muted:#596a75;--line:#dce3e7;--blue:#2455a4;--paper:#fff;--wash:#f4f6f8;--red:#b3472f}*{box-sizing:border-box}body{margin:0;background:var(--wash);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.6}main{max-width:1080px;margin:auto;padding:46px 26px 70px}header{padding:0 0 28px;border-bottom:1px solid var(--line)}.eyebrow{letter-spacing:.17em;text-transform:uppercase;font-size:11px;font-weight:700;color:var(--blue)}h1{font:normal 43px/1.15 Georgia,serif;margin:12px 0 16px}h2{font:normal 26px/1.3 Georgia,serif;margin:0 0 16px}p{margin:10px 0}.intro{font-size:17px;max-width:790px;color:var(--muted)}.badge{font-size:11px;font-weight:700;letter-spacing:.06em;display:inline-block;border:1px solid #e2b19c;color:#8f391f;border-radius:30px;padding:4px 12px;background:#fff8f4}.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:27px;margin-top:26px}.inputrow{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap}label{display:block;font-size:13px;font-weight:650;margin-bottom:6px}input{font:18px Georgia,serif;padding:12px 14px;border:1px solid #bdcbd3;border-radius:6px;width:100%;color:var(--ink)}.rank{width:100px}.xinput{flex:1;min-width:180px}button{border:0;border-radius:6px;background:var(--blue);color:white;font:600 14px system-ui;padding:15px 25px;cursor:pointer}button:disabled{opacity:.65;cursor:wait}.help{font-size:12px;color:var(--muted)}.status{font-size:13px;min-height:23px;color:var(--muted);margin:12px 0}.result{border-top:1px solid var(--line);padding-top:20px}.number{font:34px/1.3 Georgia,serif;overflow-wrap:anywhere}.resultgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px}.metric{padding:15px;background:var(--wash);border-radius:7px}.metric span{display:block;font-size:12px;color:var(--muted)}.metric strong{font-weight:550;font-size:17px}.note{font-size:13px;max-width:870px;color:var(--muted)}.warn{border-left:3px solid #c4794f;padding-left:14px;color:#764222}details{margin-top:20px}summary{cursor:pointer;font-weight:600}pre{overflow-x:auto;background:#f3f5f7;border:1px solid var(--line);border-radius:6px;padding:15px;line-height:1.55;font-size:13px}a{color:var(--blue)}.tabs{display:flex;gap:10px;margin:0 0 17px}.tabs button{background:#eaf0f7;color:var(--blue);padding:9px 16px}.tabs button.active{background:var(--blue);color:white}.plot{width:100%;display:block;background:white}.links{font-size:13px;display:flex;gap:18px;flex-wrap:wrap}.formula{font:20px Georgia,serif;margin:18px 0}footer{color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:22px;margin-top:30px}@media(max-width:640px){main{padding:25px 15px 40px}h1{font-size:33px}.card{padding:20px}.inputrow{gap:12px}.resultgrid{grid-template-columns:1fr}.number{font-size:29px}}
-</style></head><body><main>
-<header><div class="eyebrow">Almost primes / numerical explorer</div><h1>Riemann functions for almost primes</h1><p class="intro">Explore the real-cut functions R<sub>k</sub>(x), with k counting prime factors <em>with multiplicity</em>. Enter a rank and a real x; the calculation runs in your browser.</p><span class="badge">EXPLORATORY — NOT CERTIFIED</span></header>
-<section class="card"><h2>Calculate R<sub>k</sub>(x)</h2><form id="form"><div class="inputrow"><div class="rank"><label for="k">Rank k</label><input type="number" id="k" min="1" max="6" step="1" value="2" required></div><div class="xinput"><label for="x">Value of x</label><input id="x" value="1000000" inputmode="decimal" required aria-describedby="inputhelp"></div><button id="run">Calculate</button></div><p class="help" id="inputhelp">k = 1…6; 1 &lt; x ≤ 10¹². Accepts 1000000, 1e6 or 10^6. These are interface limits, not accuracy guarantees.</p></form><p id="status" class="status" role="status">Prepared quadrature data load on the first calculation.</p>
-<div id="result" class="result" hidden><span class="eyebrow" id="resultlabel"></span><div class="number" id="value"></div><p class="note" id="counts"></p><div class="resultgrid"><div class="metric"><span>Change from 64 to 128 reciprocal cells</span><strong id="cutoff"></strong></div><div class="metric"><span>Change after halving the integration mesh</span><strong id="mesh"></strong></div></div><p class="note warn">These changes are sensitivity checks, <strong>not upper error bounds</strong>. For k ≥ 2, the interval 0 &lt; σ &lt; 1/129 is omitted. Stable displayed digits are not automatically correct digits.</p></div>
-<details><summary>What is being evaluated?</summary><p class="formula">R<sub>k,Q</sub>(x) = ∫<sub>1/(Q+1)</sub><sup>1</sup> Δ<sub>k</sub>(σ) x<sup>σ</sup> dσ / σ</p><p class="note">For k ≥ 2, this is a finite-cut approximation to the complete real-cut definition, not a truncated Selberg asymptotic expansion. The calculator uses Q = 128, tanh–sinh quadrature, a truncated Möbius series for the prime-zeta boundary values, and IEEE double precision. The density and quadrature weights are prepared once; the exponential x<sup>σ</sup> is evaluated afresh for every input. Nothing is interpolated from the plots.</p><p class="note">Rank 1 is evaluated separately by the convergent Gram series for Riemann’s R-function. For floor(x) ≤ 10⁶, the exact count N<sub>k</sub>(floor(x)) is also computed by a sieve. R<sub>k</sub> is a smooth model and is not itself an exact almost-prime count.</p><p class="note">For rigorous values, use a separately validated interval implementation enclosing quadrature, Möbius truncation and the complete lower cut. This demonstration is not the FLINT/Arb certified hybrid.</p></details></section>
-<section class="card"><h2>Adjacent counting-error oscillations</h2><div class="tabs"><button type="button" data-pair="1" class="active">k = 1 and 2</button><button type="button" data-pair="2">k = 2 and 3</button></div><img id="plot" class="plot" src="adjacent_k1_k2.svg" alt="Blue scaled rank-one error compared with the negative rank-two error"><p class="note">D<sub>k</sub> = R<sub>k</sub> − N<sub>k</sub>. Blue: s<sub>k</sub>(x)D<sub>k</sub>(x). Red: −D<sub>k+1</sub>(x). The multiplier comes from the first-zero coefficient model; it is not fitted to these data. Numerical approximants are substituted for R₂ and R₃. The curves are unsmoothed.</p><p class="note warn">Alternation with k is not, by itself, a demonstration of the sieve parity barrier or a route to RH or twin primes. Conditional zero-spectrum results and correlations restricted to shifted primes are different statements.</p><div class="links"><a id="pdfplot" href="adjacent_k1_k2.pdf">Vector PDF</a><a href="adjacent_data.csv">Numerical data (CSV)</a><a href="validation.json">Sensitivity checks (JSON)</a></div></section>
-<section class="card"><h2>Reproduce and extend</h2><p class="note">The core implementation uses NumPy and SciPy and can be loaded in SageMath. It has been executed in Python; the public SageMathCell service is an optional, separate external service.</p><pre>load("rk_calculator.py")
-print(rk_report(k=2, x=10**6, Q=64))
+:root{--ink:#182938;--muted:#596a75;--line:#dce3e7;--blue:#2455a4;--paper:#fff;--wash:#f4f6f8;--red:#b3472f}*{box-sizing:border-box}body{margin:0;background:var(--wash);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.6}main{max-width:1080px;margin:auto;padding:46px 26px 70px}header{padding:0 0 28px;border-bottom:1px solid var(--line)}.eyebrow{letter-spacing:.17em;text-transform:uppercase;font-size:11px;font-weight:700;color:var(--blue)}h1{font:normal 43px/1.15 Georgia,serif;margin:12px 0 16px}h2{font:normal 26px/1.3 Georgia,serif;margin:0 0 16px}p{margin:10px 0}.intro{font-size:17px;max-width:790px;color:var(--muted)}.badge{font-size:11px;font-weight:700;letter-spacing:.06em;display:inline-block;border:1px solid #e2b19c;color:#8f391f;border-radius:30px;padding:4px 12px;background:#fff8f4}.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:27px;margin-top:26px}.inputrow{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap}label{display:block;font-size:13px;font-weight:650;margin-bottom:6px}input{font:18px Georgia,serif;padding:12px 14px;border:1px solid #bdcbd3;border-radius:6px;width:100%;color:var(--ink)}.rank{width:100px}.xinput{flex:1;min-width:180px}button{border:0;border-radius:6px;background:var(--blue);color:white;font:600 14px system-ui;padding:15px 25px;cursor:pointer}button:disabled{opacity:.65;cursor:wait}.help{font-size:12px;color:var(--muted)}.status{font-size:13px;min-height:23px;color:var(--muted);margin:12px 0}.result{border-top:1px solid var(--line);padding-top:20px}.number{font:34px/1.3 Georgia,serif;overflow-wrap:anywhere}.resultgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px}.metric{padding:15px;background:var(--wash);border-radius:7px}.metric span{display:block;font-size:12px;color:var(--muted)}.metric strong{font-weight:550;font-size:17px}.note{font-size:13px;max-width:870px;color:var(--muted)}.warn{border-left:3px solid #c4794f;padding-left:14px;color:#764222}details{margin-top:20px}summary{cursor:pointer;font-weight:600}pre{overflow-x:auto;background:#f3f5f7;border:1px solid var(--line);border-radius:6px;padding:15px;line-height:1.55;font-size:13px}a{color:var(--blue)}.links{font-size:13px;display:flex;gap:18px;flex-wrap:wrap}.formula{font:20px Georgia,serif;margin:18px 0}footer{color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:22px;margin-top:30px}@media(max-width:640px){main{padding:25px 15px 40px}h1{font-size:33px}.card{padding:20px}.inputrow{gap:12px}.resultgrid{grid-template-columns:1fr}.number{font-size:29px}}
 
-# Generate both plots and export the data:
-export_demo(xmax=10**6, step=100, Q=128, h=0.05)</pre><div class="links"><a href="rk_calculator.py" download>Python / Sage module</a><a href="rk_sagecell.txt" download>Complete Sage cell text</a><a href="sage.html">Open embedded Sage cell</a><a href="rk_native.cpp" download>C++ evaluator</a><a href="README.md">Instructions and limitations</a></div></section>
+[hidden]{display:none!important}.secondary{background:#e8edf3;color:var(--blue);border:1px solid #cbd7e2;padding:14px 20px}.progressbox{margin:14px 0 22px;padding:17px 18px;background:#f5f8fb;border:1px solid #dce5ef;border-radius:8px}.progresshead,.timerow{display:flex;justify-content:space-between;gap:15px;align-items:center}.progresshead{font-size:13px;margin-bottom:8px}.progresshead strong{font-variant-numeric:tabular-nums;color:var(--blue)}progress{display:block;width:100%;height:9px;appearance:none;border:none;border-radius:8px;overflow:hidden;background:#dde6ef}progress::-webkit-progress-bar{background:#dde6ef;border-radius:8px}progress::-webkit-progress-value{background:var(--blue);border-radius:8px}progress::-moz-progress-bar{background:var(--blue);border-radius:8px}.timerow{margin-top:8px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}.number.big{font-size:23px;font-variant-numeric:tabular-nums;line-height:1.6;max-width:100%;word-break:normal;overflow-wrap:anywhere}.scientific{margin-top:10px;font:23px/1.5 Georgia,serif;color:var(--blue)}.metric strong{overflow-wrap:anywhere}.metric small{display:block;margin-top:7px;color:var(--muted);font-size:11px}.metric{min-width:0}input:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:3px}@media(max-width:640px){.timerow{align-items:flex-start;flex-direction:column;gap:2px}.progresshead{align-items:flex-start}.number.big{font-size:19px}.scientific{font-size:19px}}
+</style></head><body><main>
+<header><div class="eyebrow">Almost primes / numerical calculator</div><h1>Riemann functions for almost primes</h1><p class="intro">Evaluate the real-cut functions R<sub>k</sub>(x), with k counting prime factors <em>with multiplicity</em>. Enter a rank and a real x; the calculation runs in your browser.</p><span class="badge">EXPLORATORY — NOT CERTIFIED</span></header>
+<section class="card"><h2>Calculate R<sub>k</sub>(x)</h2><form id="form"><div class="inputrow"><div class="rank"><label for="k">Rank k</label><input type="number" id="k" min="1" max="6" step="1" value="2" required></div><div class="xinput"><label for="x">Value of x</label><input id="x" value="1000000" inputmode="text" required aria-describedby="inputhelp"></div><button id="run" type="submit">Calculate</button><button id="cancel" class="secondary" type="button" hidden>Cancel</button></div><p class="help" id="inputhelp">k = 1…6; 1 &lt; x ≤ 10³⁰⁰. Accepts 1000000, 1e100 or 10^100. Large results are approximations, not certified integer values.</p></form><p id="status" class="status" role="status" aria-live="polite">Ready. Data load once, on your first calculation.</p>
+<div id="progressbox" class="progressbox" hidden>
+  <div class="progresshead"><span id="stage">Starting</span><strong id="percent">0%</strong></div>
+  <progress id="progress" max="100" value="0" aria-label="Calculation progress">0%</progress>
+  <div class="timerow"><span id="elapsed">Elapsed: 0.0 s</span><span id="timingnote">Preparing calculation</span></div>
+</div>
+<div id="result" class="result" hidden><span class="eyebrow" id="resultlabel"></span><div class="number" id="value"></div><div class="scientific" id="scientific" hidden></div>
+<p class="help" id="roundingnote">Rounded numerical approximation; not a certified integer value.</p>
+<p class="note warn" id="largewarning" hidden>At this size, double-precision arithmetic cannot determine the units digit. The full integer is the rounded numerical approximation, not an exact value; its many trailing digits are not reliable.</p><p class="note" id="counts"></p><div class="resultgrid"><div class="metric"><span>Change from 64 to 128 reciprocal cells</span><strong id="cutoff"></strong><small id="cutoffrel"></small></div><div class="metric"><span>Change after halving the integration mesh</span><strong id="mesh"></strong><small id="meshrel"></small></div></div><p class="note warn" id="methodwarning">These changes are sensitivity checks, <strong>not upper error bounds</strong>. For k ≥ 2, the interval 0 &lt; σ &lt; 1/129 is omitted. Rounding the approximation does not certify the correctly rounded value of the full R<sub>k</sub>.</p></div>
+<details><summary>What is being evaluated?</summary><p class="formula">R<sub>k,Q</sub>(x) = ∫<sub>1/(Q+1)</sub><sup>1</sup> Δ<sub>k</sub>(σ) x<sup>σ</sup> dσ / σ</p><p class="note">For k ≥ 2, this is a finite-cut approximation to the complete real-cut definition, not a truncated Selberg asymptotic expansion. The calculator uses Q = 128, tanh–sinh quadrature, a truncated Möbius series for the prime-zeta boundary values, and IEEE double precision. The density and quadrature weights are prepared once; the exponential is evaluated afresh for every input. For large inputs, terms are evaluated as exp((σ − 1) log x) and the final sum is multiplied by x, avoiding excessively large intermediate terms. Each input is evaluated directly using these quadrature weights.</p><p class="note">Rank 1 is evaluated separately by the convergent Gram series for Riemann’s R-function, with a stopping test that also handles large x. For floor(x) ≤ 10⁶, the exact count N<sub>k</sub>(floor(x)) is also computed by a sieve. R<sub>k</sub> is a smooth model and is not itself an exact almost-prime count.</p><p class="note">For rigorous values, use a separately validated interval implementation enclosing quadrature, Möbius truncation and the complete lower cut. This demonstration is not the FLINT/Arb certified hybrid.</p><p class="note">The progress bar follows downloaded data and completed calculation stages, not a simulated delay. Elapsed time is measured in your browser. A remaining-time estimate is shown only when enough download measurements exist; it is approximate. Cached or small calculations may finish almost immediately. Cancel stops the worker immediately.</p></details></section>
+<section class="card"><h2>Reproduce and extend</h2><p class="note">The core implementation uses NumPy and SciPy and can be loaded in SageMath. It has been executed in Python; the public SageMathCell service is an optional, separate external service.</p><pre>load("rk_calculator.py")
+report = rk_report(k=2, x=10**6, Q=64)
+print(round(report["value"]))</pre><div class="links"><a href="rk_calculator.py" download>Python / Sage module</a><a href="rk_sagecell.txt" download>Complete Sage cell text</a><a href="sage.html">Open embedded Sage cell</a><a href="rk_native.cpp" download>C++ evaluator</a><a href="README.md">Instructions and limitations</a></div></section>
 <footer>Construction: M. Belton, <a href="https://arxiv.org/abs/2610.11024">A note on Riemann’s R-function and almost primes</a>. Related contour explanation: <a href="https://mathoverflow.net/questions/35927/asymptotic-density-of-k-almost-primes">Lucia’s MathOverflow answer</a>. The online calculator is illustrative, not a proof or numerical certificate.</footer></main>
 <script>
-let worker,serial=0;const $=id=>document.getElementById(id);function fmt(x){return x===null?'Not applicable':Number(x).toPrecision(5);}function parseX(s){s=s.trim().replace(/,/g,'');let m=s.match(/^10\s*\^\s*([+-]?\d+(?:\.\d+)?)$/);return m?10**Number(m[1]):Number(s);}
-$('form').addEventListener('submit',ev=>{ev.preventDefault();let k=Number($('k').value),x=parseX($('x').value);if(!Number.isInteger(k)||k<1||k>6||!Number.isFinite(x)||x<=1||x>1e12){$('status').textContent='Use integer k = 1…6 and 1 < x ≤ 10¹².';return;}if(!worker){worker=new Worker('worker.js');worker.onmessage=ev=>{let d=ev.data;if(d.id!==serial)return;$('run').disabled=false;if(d.error){$('status').textContent=d.error;return;}$('status').textContent='Calculated locally in your browser.';$('result').hidden=false;$('resultlabel').textContent=d.k===1?'R₁(x), convergent Gram series':'Finite-cut approximation to R'+d.k+'(x)';$('value').textContent=(d.k===1?'':'≈ ')+d.value.toPrecision(11);$('cutoff').textContent=fmt(d.cutoff);$('mesh').textContent=fmt(d.mesh);$('counts').textContent=d.count===null?'Exact counts are displayed only for floor(x) ≤ 10⁶.':'Exact N'+d.k+'(floor(x)) = '+d.count.toLocaleString()+'. Corresponding model minus count ≈ '+(d.value-d.count).toPrecision(8)+'.';};worker.onerror=()=>{$('run').disabled=false;$('status').textContent='The worker failed. Serve this folder through GitHub Pages or a local HTTP server, not file://.';};}$('run').disabled=true;$('status').textContent='Loading quadrature data / evaluating in your browser…';worker.postMessage({id:++serial,k,x});});
-document.querySelectorAll('[data-pair]').forEach(b=>b.addEventListener('click',()=>{let k=Number(b.dataset.pair);document.querySelectorAll('[data-pair]').forEach(t=>t.classList.toggle('active',t===b));$('plot').src='adjacent_k'+k+'_k'+(k+1)+'.svg';$('plot').alt='Scaled rank-'+k+' error and negative rank-'+(k+1)+' error';$('pdfplot').href='adjacent_k'+k+'_k'+(k+1)+'.pdf';}));
+'use strict';
+const RK_VERSION = 'large-inputs-progress-20261106-v1';
+const $ = id => document.getElementById(id);
+let worker, serial=0, timer=null, started=0, running=false, lastPercent=0;
+let downloadStarted=null, downloadFirstPercent=null;
+const integerFormat = new Intl.NumberFormat('en-GB', {useGrouping:true, maximumFractionDigits:0});
+
+function nearestInteger(value) {
+  if (!Number.isFinite(value)) return 'Unavailable';
+  const rounded = Math.sign(value)*Math.round(Math.abs(value));
+  if (rounded === 0) return '0';
+  // BigInt is used ONLY to format the integer represented by the numerical
+  // result. It does not add arithmetic precision or certify any digit.
+  if (Math.abs(rounded)>Number.MAX_SAFE_INTEGER && typeof BigInt==='function') {
+    return integerFormat.format(BigInt(rounded));
+  }
+  return integerFormat.format(rounded);
+}
+function scientificHTML(value,digits=9) {
+  if (!Number.isFinite(value)) return 'Unavailable';
+  if (value===0) return '0';
+  const [mantissa, exponent]=value.toExponential(digits).split('e');
+  return mantissa + ' × 10<sup>' + String(Number(exponent)) + '</sup>';
+}
+function sensitivityHTML(value) {
+  if (value===null || value===undefined) return 'Not applicable';
+  if (!Number.isFinite(value) || value<0) return 'Unavailable';
+  if (value===0) return 'No change resolved';
+  if (value<1) return 'Less than 1';
+  if (value<1e12) return 'About '+nearestInteger(value);
+  return '≈ '+scientificHTML(value,3);
+}
+function relativeHTML(value) {
+  if (value===null || value===undefined || !Number.isFinite(value)) return '';
+  if (value===0) return 'Below the resolution of this check; not a zero-error bound.';
+  return 'Relative change: '+scientificHTML(value,2)+' (not an error bound)';
+}
+function parseX(text) {
+  const s=String(text).trim().replace(/,/g,'');
+  const power=s.match(/^10\s*(?:\^|\*\*)\s*\(?\s*([+-]?\d+(?:\.\d+)?)\s*\)?$/);
+  if (power) return 10**Number(power[1]);
+  if (!/^[+]?((\d+(?:\.\d*)?)|(\.\d+))(?:[eE][+-]?\d+)?$/.test(s)) return NaN;
+  return Number(s);
+}
+function duration(seconds) {
+  if (seconds<60) return seconds.toFixed(1)+' s';
+  const m=Math.floor(seconds/60), s=Math.floor(seconds%60);
+  return m+' min '+s+' s';
+}
+function updateTime() {
+  if (started) $('elapsed').textContent='Elapsed: '+duration((performance.now()-started)/1000);
+}
+function beginProgress() {
+  running=true; started=performance.now(); lastPercent=0;
+  downloadStarted=null; downloadFirstPercent=null;
+  clearInterval(timer); timer=setInterval(updateTime,100);
+  $('progressbox').hidden=false; $('progress').value=0; $('percent').textContent='0%';
+  $('stage').textContent='Starting calculation'; $('timingnote').textContent='Preparing data';
+  updateTime(); $('run').disabled=true; $('cancel').hidden=false;
+  $('k').disabled=true; $('x').disabled=true; $('result').hidden=true;
+}
+function finishProgress(stage,complete) {
+  updateTime(); clearInterval(timer); timer=null; running=false;
+  $('run').disabled=false; $('cancel').hidden=true; $('k').disabled=false; $('x').disabled=false;
+  $('stage').textContent=stage;
+  if (complete) {$('progress').value=100;$('percent').textContent='100%';}
+  $('timingnote').textContent=complete?'Completed':'No new result';
+}
+function showProgress(d) {
+  lastPercent=Math.max(lastPercent,Number(d.percent)||0);
+  $('progress').value=lastPercent; $('percent').textContent=Math.floor(lastPercent)+'%';
+  $('stage').textContent=d.stage; updateTime();
+  if (lastPercent>=4 && lastPercent<35) {
+    const now=performance.now();
+    if (downloadStarted===null) {downloadStarted=now;downloadFirstPercent=lastPercent;}
+    const seconds=(now-downloadStarted)/1000, advance=lastPercent-downloadFirstPercent;
+    if (seconds>0.7 && advance>1) {
+      const remaining=seconds*(35-lastPercent)/advance;
+      $('timingnote').textContent='Data load remaining: about '+duration(remaining);
+    } else $('timingnote').textContent='Downloading fixed data; timing depends on connection';
+  } else if (lastPercent>=35) {
+    $('timingnote').textContent='Computing locally; bar tracks completed work';
+  }
+}
+function showResult(d) {
+  if (!Number.isFinite(d.value)) throw new Error('No finite numerical result was returned.');
+  finishProgress('Calculation complete',true);
+  $('status').textContent='Calculated in your browser in '+duration((performance.now()-started)/1000)+'.';
+  $('result').hidden=false;
+  $('resultlabel').textContent=d.k===1?'R₁(x) · convergent Gram series':'R'+d.k+'(x) · finite-cut numerical approximation';
+  $('value').innerHTML='≈ '+nearestInteger(d.value).replace(/,/g,',<wbr>');
+  const large=Math.abs(d.value)>Number.MAX_SAFE_INTEGER;
+  $('value').classList.toggle('big',large);
+  $('largewarning').hidden=!large;
+  $('scientific').hidden=!large;
+  if(large) $('scientific').innerHTML='≈ '+scientificHTML(d.value,9)+' (compact approximation)';
+  $('roundingnote').textContent=large
+    ?'Shown as a whole integer, but only the leading digits are numerically meaningful. This is not correctly-rounded arbitrary-precision evaluation.'
+    :'Displayed to the nearest integer; the underlying approximation is not certified.';
+  $('cutoff').innerHTML=sensitivityHTML(d.cutoff);
+  $('mesh').innerHTML=sensitivityHTML(d.mesh);
+  $('cutoffrel').innerHTML=relativeHTML(d.cutoffRelative);
+  $('meshrel').innerHTML=relativeHTML(d.meshRelative);
+  $('counts').textContent=d.count===null
+    ?'Exact-count comparison is available only for floor(x) ≤ 1,000,000.'
+    :'Exact N'+d.k+'(floor(x)) = '+integerFormat.format(d.count)+
+      '. Model minus count (rounded) ≈ '+nearestInteger(d.value-d.count)+'.';
+  $('methodwarning').innerHTML=d.k===1
+    ?'Rank 1 uses the convergent Gram series ('+d.terms+' terms) in double precision. The stopping test is numerical, not an interval certificate.'
+    :'These changes are sensitivity checks, <strong>not upper error bounds</strong>. The interval 0 &lt; σ &lt; 1/129 is omitted. Both meshes also share finite endpoint coverage and double-precision rounding; agreement between them can underestimate the actual error. Rounding the output does not certify the correctly rounded full R<sub>k</sub>.';
+}
+function getWorker() {
+  if (worker) return worker;
+  worker=new Worker('worker.js?v='+encodeURIComponent(RK_VERSION));
+  worker.onmessage=event=>{
+    const d=event.data;
+    if(d.id!==serial || !running) return;
+    if(d.version!==RK_VERSION) {
+      finishProgress('Calculator files do not match',false);
+      $('status').textContent='Please replace both index.html and worker.js, then refresh with Ctrl+F5.';
+      worker.terminate();worker=undefined;return;
+    }
+    if(d.type==='progress') {showProgress(d);return;}
+    if(d.type==='error') {
+      finishProgress('Calculation stopped',false);$('status').textContent=d.error;return;
+    }
+    if(d.type==='result') {
+      try {showResult(d);} catch(e) {finishProgress('Display error',false);$('status').textContent=e.message;}
+    }
+  };
+  worker.onerror=()=>{
+    finishProgress('Worker could not run',false);
+    $('status').textContent='Check that worker.js and all kernel files were uploaded. Open through GitHub Pages or an HTTP server, not file://.';
+    worker.terminate();worker=undefined;
+  };
+  return worker;
+}
+$('form').addEventListener('submit',event=>{
+  event.preventDefault(); if(running)return;
+  const k=Number($('k').value), x=parseX($('x').value);
+  if(!Number.isInteger(k)||k<1||k>6||!Number.isFinite(x)||x<=1||x>1e300) {
+    $('status').textContent='Use integer k = 1…6 and 1 < x ≤ 10^300, for example 10^100 or 1e100.';
+    $('result').hidden=true;return;
+  }
+  beginProgress();$('status').textContent='Loading data / calculating…';
+  try {getWorker().postMessage({id:++serial,k,x});}
+  catch(e) {finishProgress('Could not start',false);$('status').textContent=e.message;}
+});
+$('cancel').addEventListener('click',()=>{
+  if(!running)return;
+  ++serial; if(worker){worker.terminate();worker=undefined;}
+  finishProgress('Cancelled',false);$('status').textContent='Cancelled. No new value was produced.';
+});
 </script></body></html>

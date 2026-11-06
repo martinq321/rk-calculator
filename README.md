@@ -1,137 +1,79 @@
-# R_k online calculator — exploratory numerical edition
+# R_k calculator — large inputs, progress and integer display
 
-This package evaluates the prescribed real-cut almost-prime functions numerically.
-It is NOT the earlier certified FLINT/Arb hybrid and does not provide certificates.
-It contains a working static browser calculator, Sage/Python source, a native C++
-evaluator using the same prepared quadrature, plots, underlying data and checks.
+This is the exploratory browser calculator, NOT the certified FLINT/Arb hybrid.
+The main page has no adjacent-error plot section.
 
-## Fastest start: GitHub Pages
+## Update an existing GitHub Pages site
 
-1. Create a repository, for example `rk-calculator`.
-2. Upload the CONTENTS of this directory to its root, keeping the binary kernel files.
-3. In Settings > Pages, choose Deploy from a branch, `main`, `/(root)`, then Save.
-4. Open the Pages URL GitHub provides. For the account `martinq321` and the repository
-   above, the expected URL after deployment is `https://martinq321.github.io/rk-calculator/`.
-   This package has not been deployed to that account.
+**Replace BOTH `index.html` and `worker.js`** in your existing repository root.
+The two `.bin` kernel files have not changed. The updated worker also works with
+an older copy of kernels.json from this calculator. To keep the downloadable
+Python / Sage / C++ sources and metadata synchronized, upload all this package's
+files over the old ones. Leave the Pages settings unchanged: main / root.
+After deployment, reload with Ctrl+F5. The worker URL carries a version suffix
+to avoid accidentally using the previous 10^12-limited worker.
 
-No compiler, Python server or Sage server is needed for the main browser calculator.
-It uses JavaScript in a Web Worker and downloads prepared quadrature data. It evaluates
-x afresh; it does not interpolate the plotted table. The optional `sage.html` page uses
-the external public SageMathCell service, and discloses that service use before loading.
+## New site / local test
 
-For local testing, run `python -m http.server 8000` in this directory and open
-`http://localhost:8000/`. Do not open index.html as file:// because browsers normally
-block worker/data loading from local file URLs.
+Put these files at the repository root (not inside an extra folder):
+`index.html`, `worker.js`, `kernels.json`, `kernels_fine.bin`, `kernels_mesh.bin`.
+Upload the remaining source and help files as well. Keep `.nojekyll`.
+For a local test: `python -m http.server 8000`, then open localhost:8000.
+Opening index.html through file:// does not load the worker data correctly.
 
-## SageMath / Python
+## Inputs and output
 
-In a local Sage session:
+- k = 1,...,6 and 1 < x <= 10^300.
+- Enter `10^100`, `10**100`, `1e100`, or a decimal number; commas are accepted.
+- The main answer is the numerical approximation rounded to a whole integer.
+- Large results also have a compact scientific-notation summary.
+- Large results are NOT known to the units digit. Float64 has limited precision;
+  formatting an integer, even with BigInt, does not add precision to the calculation.
+- The sensitivity diagnostics are NOT error certificates.
+- The original plots have not been restored.
 
-```python
-load('rk_calculator.py')
-print(rk_report(k=2, x=10**6, Q=64))
-export_demo(outdir='rk_demo', xmax=10**6, step=100, Q=128, h=0.05, show=True)
-```
+## Progress / time bar
 
-For a self-contained public SageMathCell calculation, paste ALL of `rk_sagecell.txt`.
-It includes the implementation and sample call; no download/import URL is required.
-Change the input call near the bottom. `rk_demo.sage` has the same contents.
+The bar advances on fixed kernel bytes downloaded, quadrature nodes processed,
+and exact-count sieve stages. Elapsed time is real browser time. No artificial
+waiting period is added. A rough remaining download time appears only when enough
+transfer measurements exist; no invented countdown is used for instantaneous work.
+Fast or cached evaluations can finish before several intermediate states are visible.
+Cancel immediately terminates the worker; the next run reloads its data.
 
-In Python, dependencies are numpy, scipy and matplotlib (plots only):
+## Numerical method
 
-```bash
-python -c "from rk_calculator import rk_report; print(rk_report(2,1e6))"
-```
+For k>=2, the quadrature approximates
+  integral_(1/129)^1 Delta_k(sigma) x^sigma / sigma d sigma.
+It is a finite part of the real cut, not a finite Selberg expansion. Tanh-sinh
+quadrature, truncated Mobius sums, finite endpoint coverage and float64 errors
+remain. The interval (0,1/129) is omitted and is NOT enclosed.
 
-The numerical core was executed in Python with NumPy and SciPy. It is compatible with
-Sage's Python environment, but was NOT run in a Sage kernel or public SageMathCell here.
-No guarantee about the public service's time limits or availability is implied.
+Large-input summation uses exp((sigma-1)*log(x)); the final sum is multiplied by x.
+This avoids unnecessarily large intermediate exponentials. The cutoff sensitivity
+is now summed from the extra cells directly, so it is not lost by subtracting
+nearly identical huge totals. The mesh sensitivity can still miss common errors.
 
-## Native C++
+For k=1, the convergent Gram series uses an input-dependent stopping test, not
+the old fixed 200-term ceiling. Beyond the saved denominator table, zeta(n+1)-1
+is below float64 resolution, so n*zeta(n+1) is replaced by n at working precision.
 
-From this directory, with a C++17 compiler:
+The new numeric range is an input support limit, NOT a uniform accuracy guarantee.
+Full correctly-rounded integers at x=10^100 require a different, multiprecision
+and error-certified evaluator; this package does not supply that capability.
 
-```bash
-g++ -O3 -std=c++17 rk_native.cpp -o rk_native
-./rk_native 2 1000000
-```
+## Optional sources
 
-On MSYS2/Windows the output can be named `rk_native.exe` and run as `./rk_native.exe`.
-The source was compiled and run with g++ in Linux. It reads the supplied little-endian
-float64 kernel data; it does not link to FLINT, Arb, GMP or MPFR. This is NOT a port of
-the earlier certified executable. It evaluates a prepared quadrature rather than
-recomputing the prime-zeta densities in C++.
+Sage/Python:
+  load("rk_calculator.py")
+  report = rk_report(k=2, x=10**100, Q=64)
+  print(round(report["value"]))
 
-## Optional C++ -> WebAssembly
+Native C++:
+  g++ -O3 -std=c++17 rk_native.cpp -o rk_native
+  ./rk_native 2 1e100
 
-Emscripten can compile this small C++ evaluator into WebAssembly:
-
-```bash
-bash build_wasm.sh
-python -m http.server 8000
-```
-
-Then open `wasm_demo.html`. The build emits rk_wasm.js, rk_wasm.wasm and rk_wasm.data.
-This optional WebAssembly build was NOT executed here (Emscripten was not installed).
-The native C++ build was executed. The main index.html works without this optional build.
-
-GitHub Pages hosts static files; it does not run a native .exe on demand. GitHub Actions
-can perform a build, but that is not a persistent per-visitor computation server.
-A browser port of the previous FLINT/Arb backend would separately need its dependencies
-and parallelism/resource model ported and validated.
-
-## Mathematical target and implementation
-
-Let F_k(s)=[z^k] exp(sum_(m>=1) P(m*s) z^m/m). For real sigma>0, the prescribed
-lower-bank value is
-
-P_-(sigma) = sum_(j>=1) mu(j)/j log|zeta(j*sigma)| + i*pi*sum_(j<=1/sigma) mu(j)/j.
-
-The target is R_k(x)=integral_0^1 Delta_k(sigma)*x^sigma/sigma d sigma,
-where Delta_k=Im(F_k(sigma-i0))/pi. Prime factors are counted WITH multiplicity.
-The recurrence n*f_n=sum_(m=1)^n P_-(m*sigma)*f_(n-m) computes the coefficients.
-
-The default computation for k>=2 uses Q=128 reciprocal cells, so integrates only
-1/129 < sigma < 1. Each cell is integrated by tanh-sinh quadrature. The Mobius sum
-is truncated after j*m*sigma reaches at least 45; the arithmetic is float64. The
-positive-real zeta function is evaluated by scipy.special.zetac, using log1p above
-1 to avoid loss of the small tail. The image of a rounded endpoint is never evaluated
-at a pole. R_1 is instead computed by its convergent Gram series.
-
-This is NOT a finite Selberg asymptotic expansion, and NOT the incomplete-gamma hybrid.
-It directly quadratures a finite part of the real cut. The difference between that
-finite part and the full integral is NOT bounded by this implementation.
-
-Changing Q or mesh size gives sensitivity measurements, not certified upper errors.
-More precision in the printed output does not supply more rigor. High k and large x
-are especially sensitive. The interface's k<=6 and x<=1e12 limits are resource bounds,
-not a claim that every value has been validated. Plot checks cover k<=3 and x<=1e6.
-
-## Plots and numerical provenance
-
-`adjacent_data.csv` has the single strictly increasing x-grid used for every curve,
-with exact N1,N2,N3 computed by a multiplicity-counting sieve and R1,R2,R3 from the
-above numerical methods. No curves are extracted from pictures or generated by AI
-image tools; no smoothing or fitted scale is used.
-
-For k=1,2, blue is s_k(x)D_k(x); red is -D_(k+1)(x), D_k=R_k-N_k.
-Write t=beta-log(log x), beta=-1.0986500372612+0.24119591642563i and
-c2=-0.95484578810794-0.23898284814566i (the manuscript's illustrative constants).
-Then s_1=-Re(t) and s_2=-Re((t^2+c2)*conj(t))/(2|t|^2).
-These first-zero constants are not independently certified here.
-
-There are 10001 unsmoothed grid points from x=10 to x=10^6, with spacing 100 and the
-last endpoint appended. The plot uses Q=128, h=0.05. `validation.json` records cutoff
-and mesh refinements, small-count cross-checks and the Gram-series cross-check.
-No convergence experiment is represented as a bound for the entire omitted lower cut.
-
-
-## Primary documentation and references
-
-- GitHub Pages: https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages
-- Emscripten: https://emscripten.org/docs/getting_started/Tutorial.html
-- SageMathCell embedding: https://sagecell.sagemath.org/static/about.html
-- Sage load: https://doc.sagemath.org/html/en/reference/repl/sage/repl/load.html
-- SciPy zetac: https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.zetac.html
-- Construction: https://arxiv.org/abs/2610.11024
-- Lucia and later references: https://mathoverflow.net/questions/35927/asymptotic-density-of-k-almost-primes
+The optional SageMathCell page sends code to that external service after the user
+chooses to load it. The main browser calculator sends no k or x to a compute server.
+The WebAssembly build script remains optional and is not required by index.html.
+See TESTING.md for exactly what was executed for this revision.

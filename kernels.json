@@ -235,6 +235,8 @@
     "k_min": 1,
     "k_max": 6,
     "x_min_exclusive": 1,
-    "x_max": 1000000000000.0
-  }
+    "x_max": 1e+300
+  },
+  "browser_revision": "large-inputs-progress-20261106-v1",
+  "large_input_note": "Scaled summation supports 1 < x <= 1e300; not arbitrary precision or a correctly-rounded Rk certificate. Gram denominators beyond the saved table use zeta(n+1)=1 at float64 resolution."
 }

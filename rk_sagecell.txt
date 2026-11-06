@@ -1,5 +1,4 @@
-# Paste this entire cell into SageMathCell.
-# The implementation is inside exec so Sage does not preparse NumPy arithmetic.
+# Self-contained Sage cell. Core executed as Python to avoid preparser changes.
 exec(r'''
 """Exploratory real-cut R_k evaluator, usable in SageMath or Python.
 
@@ -48,19 +47,24 @@ def mobius_table(n):
 def riemann_R(x):
     """Convergent Gram series, evaluated in double precision; x>=1."""
     a = np.asarray(x, dtype=float)
-    if np.any(~np.isfinite(a)) or np.any(a < 1) or np.any(a > 1e12):
-        raise ValueError('This demonstration supports 1 <= x <= 1e12.')
+    if np.any(~np.isfinite(a)) or np.any(a < 1) or np.any(a > 1e300):
+        raise ValueError('This demonstration supports 1 <= x <= 1e300.')
     y = np.log(a)
-    term = np.ones_like(y)
-    total = np.ones_like(y)
-    for n in range(1, 400):
+    term = 1.0/a
+    total = term.copy()
+    correction = np.zeros_like(y)
+    for n in range(1, int(np.max(y) + 20*np.sqrt(np.max(y)+1) + 251)):
         term = term*y/n
         add = term/(n*(1.0 + float(zetac(n+1.0))))
-        total = total + add
-        if n > float(np.max(y)) + 10 and np.all(np.abs(add) < 2e-16*np.maximum(1, total)):
+        residual = add-correction
+        updated = total+residual
+        correction = (updated-total)-residual
+        total = updated
+        if n > float(np.max(y)) + 10 and np.all(np.abs(add) < 1e-16*np.maximum(1e-308, np.abs(total))):
             break
     else:
         raise ArithmeticError('Gram series did not meet its numerical stopping rule.')
+    total = total*a
     return float(total) if total.ndim == 0 else total
 
 
@@ -135,14 +139,14 @@ class RealCutRk:
         """
         original = np.asarray(x, dtype=float)
         xs = np.atleast_1d(original)
-        if xs.ndim != 1 or np.any(~np.isfinite(xs)) or np.any(xs<=1) or np.any(xs>1e12):
-            raise ValueError('Supply a scalar or 1-D grid with 1 < x <= 1e12.')
+        if xs.ndim != 1 or np.any(~np.isfinite(xs)) or np.any(xs<=1) or np.any(xs>1e300):
+            raise ValueError('Supply a scalar or 1-D grid with 1 < x <= 1e300.')
         values = np.empty((len(xs),self.kmax))
         for start in range(0,len(xs),64):
             stop = min(start+64,len(xs))
-            kernel = np.exp(np.log(xs[start:stop,None])*self.sigma[None,:])
+            kernel = np.exp(np.log(xs[start:stop,None])*(self.sigma[None,:]-1.0))
             # einsum avoids forcing a multithreaded BLAS session in SageCell.
-            values[start:stop] = np.einsum('ij,kj->ik',kernel,self.weights,optimize=False)
+            values[start:stop] = xs[start:stop,None]*np.einsum('ij,kj->ik',kernel,self.weights,optimize=False)
         if full_r1:
             values[:,0] = riemann_R(xs)
         return values[0] if original.ndim == 0 else values
@@ -166,8 +170,8 @@ def rk_report(k, x, Q=64):
     k = _integer(k,'k',1,12)
     Q = _integer(Q,'Q',8,128)
     x = float(x)
-    if not 1<x<=1e12:
-        raise ValueError('This demonstration supports 1 < x <= 1e12.')
+    if not 1<x<=1e300:
+        raise ValueError('This demonstration supports 1 < x <= 1e300.')
     if k == 1:
         return {'k':1,'x':x,'value':riemann_R(x),
                 'method':'convergent Gram series, float64; not an interval certificate'}
@@ -176,7 +180,8 @@ def rk_report(k, x, Q=64):
     fine = _cached_engine(k,2*Q,0.05,45.0)
     v0,v1,v2 = [float(e.evaluate(x)[k-1]) for e in [coarse,deep,fine]]
     result = {'k':k,'x':x,'value':v2,
-              'cutoff_change_abs':abs(v1-v0),'mesh_change_abs':abs(v2-v1),
+              'cutoff_change_abs':float(abs(x*np.sum(np.exp(math.log(x)*(fine.sigma[fine.cells>Q]-1.0))*fine.weights[k-1,fine.cells>Q]))),
+              'mesh_change_abs':abs(v2-v1),
               'certificate':False,**fine.metadata()}
     return result
 
@@ -266,8 +271,7 @@ def export_demo(outdir='rk_demo',xmax=1000000,step=100,Q=128,h=0.05,show=False):
 
 ''' )
 
-# Choose k and x here. Q=64 reports results after refinement to Q=128.
-print(rk_report(k=2, x=10**6, Q=64))
-
-# Optional: produce both plots and their numerical data.
-# export_demo(outdir='rk_demo', xmax=10**6, step=100, Q=128, h=0.05, show=True)
+report = rk_report(k=2, x=10**100, Q=64)
+print('Rounded numerical approximation:', round(report['value']))
+print('Approximate scientific form: {:.9e}'.format(report['value']))
+print('Not certified. Large trailing integer digits are not reliable.')
