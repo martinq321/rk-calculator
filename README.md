@@ -1,79 +1,79 @@
-# R_k calculator — large inputs, progress and integer display
+# R_k calculator — k = 1..30, comma-free integers
 
-This is the exploratory browser calculator, NOT the certified FLINT/Arb hybrid.
-The main page has no adjacent-error plot section.
+Exploratory real-cut calculator. NOT the certified FLINT/Arb hybrid.
+No adjacent-error plots are shown on the website.
 
-## Update an existing GitHub Pages site
+## Updating an existing GitHub Pages site
 
-**Replace BOTH `index.html` and `worker.js`** in your existing repository root.
-The two `.bin` kernel files have not changed. The updated worker also works with
-an older copy of kernels.json from this calculator. To keep the downloadable
-Python / Sage / C++ sources and metadata synchronized, upload all this package's
-files over the old ones. Leave the Pages settings unchanged: main / root.
-After deployment, reload with Ctrl+F5. The worker URL carries a version suffix
-to avoid accidentally using the previous 10^12-limited worker.
+Replace all FIVE runtime files at the repository root:
 
-## New site / local test
+    index.html
+    worker.js
+    kernels.json
+    kernels_fine.bin
+    kernels_mesh.bin
 
-Put these files at the repository root (not inside an extra folder):
-`index.html`, `worker.js`, `kernels.json`, `kernels_fine.bin`, `kernels_mesh.bin`.
-Upload the remaining source and help files as well. Keep `.nojekyll`.
-For a local test: `python -m http.server 8000`, then open localhost:8000.
-Opening index.html through file:// does not load the worker data correctly.
+Both binary tables have changed. Replacing only index.html and worker.js is
+NOT sufficient for ranks above 6. Commit all five together. Pages settings do
+not change. Refresh the page after deployment (Ctrl+F5 on Windows).
+For all downloadable sources to match, upload every file from the full package.
 
-## Inputs and output
+The worker and data URLs carry version/hash queries to reduce stale-cache issues.
+The worker rejects metadata that is not from this revision.
 
-- k = 1,...,6 and 1 < x <= 10^300.
-- Enter `10^100`, `10**100`, `1e100`, or a decimal number; commas are accepted.
-- The main answer is the numerical approximation rounded to a whole integer.
-- Large results also have a compact scientific-notation summary.
-- Large results are NOT known to the units digit. Float64 has limited precision;
-  formatting an integer, even with BigInt, does not add precision to the calculation.
-- The sensitivity diagnostics are NOT error certificates.
-- The original plots have not been restored.
+## Input and display
 
-## Progress / time bar
+- Integer k from 1 through 30.
+- 1 < x <= 10^300.
+- Input forms include 10^100, 10**100, 1e100 and ordinary decimals.
+- Input commas are accepted, but displayed numbers have NO grouping commas.
+- The principal output is the numerical approximation rounded to a whole integer.
+- Large outputs also include a compact scientific-notation approximation.
+- The progress/time bar and Cancel button are retained.
+- Whole-integer formatting does not make the trailing digits accurate.
 
-The bar advances on fixed kernel bytes downloaded, quadrature nodes processed,
-and exact-count sieve stages. Elapsed time is real browser time. No artificial
-waiting period is added. A rough remaining download time appears only when enough
-transfer measurements exist; no invented countdown is used for instantaneous work.
-Fast or cached evaluations can finish before several intermediate states are visible.
-Cancel immediately terminates the worker; the next run reloads its data.
+Example: k=2, x=1000000 displays approximately 209965; the exact count is 210035.
 
-## Numerical method
+## New numerical tables
 
-For k>=2, the quadrature approximates
-  integral_(1/129)^1 Delta_k(sigma) x^sigma / sigma d sigma.
-It is a finite part of the real cut, not a finite Selberg expansion. Tanh-sinh
-quadrature, truncated Mobius sums, finite endpoint coverage and float64 errors
-remain. The interval (0,1/129) is omitted and is NOT enclosed.
+The tables have been rebuilt through rank 30, not padded with missing values.
+They retain Q=128 reciprocal cells and meshes h=.05 and h=.10, but use longer
+endpoint tails (tanh-sinh |u|<=5) and preserve distances to both reciprocal
+endpoints separately. The regularized zeta pole is evaluated from a local Taylor
+series. This avoids losing essential high powers of logarithms when a node
+rounds to an endpoint in ordinary floating-point coordinates.
 
-Large-input summation uses exp((sigma-1)*log(x)); the final sum is multiplied by x.
-This avoids unnecessarily large intermediate exponentials. The cutoff sensitivity
-is now summed from the extra cells directly, so it is not lost by subtracting
-nearly identical huge totals. The mesh sensitivity can still miss common errors.
+For k>=2, the target remains the finite-cut integral from 1/129 to 1. The lower
+cut is OMITTED. Cutoff and mesh changes are sensitivity diagnostics, not upper
+bounds. Higher ranks can involve substantial cancellation and may be unreliable
+at small x. The numerical function is not the exact almost-prime count.
 
-For k=1, the convergent Gram series uses an input-dependent stopping test, not
-the old fixed 200-term ceiling. Beyond the saved denominator table, zeta(n+1)-1
-is below float64 resolution, so n*zeta(n+1) is replaced by n at working precision.
+For k=1 the convergent Gram series is used. Large-input quadrature sums
+exp((sigma-1)*log(x)) in float64 and multiplies by x afterwards.
 
-The new numeric range is an input support limit, NOT a uniform accuracy guarantee.
-Full correctly-rounded integers at x=10^100 require a different, multiprecision
-and error-certified evaluator; this package does not supply that capability.
+No full-R_k certificate, correctly-rounded full integer, or uniform accuracy
+throughout the accepted input range is asserted. BigInt is used for display
+only; it does not increase computation precision.
 
-## Optional sources
+## Local use and optional sources
 
-Sage/Python:
-  load("rk_calculator.py")
-  report = rk_report(k=2, x=10**100, Q=64)
-  print(round(report["value"]))
+Serve this directory with `python -m http.server 8000` and open it through HTTP;
+file:// does not support the worker/data loading in this page.
 
-Native C++:
-  g++ -O3 -std=c++17 rk_native.cpp -o rk_native
-  ./rk_native 2 1e100
+Python / Sage:
 
-The optional SageMathCell page sends code to that external service after the user
-chooses to load it. The main browser calculator sends no k or x to a compute server.
-The WebAssembly build script remains optional and is not required by index.html.
-See TESTING.md for exactly what was executed for this revision.
+    load("rk_calculator.py")
+    report = rk_report(k=30, x=10**100, Q=64)
+    print(round(report["value"]))
+
+The numerical module uses NumPy and SciPy. It was tested in Python, not inside
+a Sage kernel. The optional embedded Sage page uses an external service only
+when explicitly activated. The main calculator runs entirely in the browser.
+
+C++ (run from the package folder):
+
+    g++ -O3 -std=c++17 rk_native.cpp -o rk_native
+    ./rk_native 30 1e100
+
+The optional WebAssembly script has not been executed for this update and is
+not required by the website. See TESTING.md for the executed checks.

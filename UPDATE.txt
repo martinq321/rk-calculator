@@ -1,0 +1,14 @@
+K UP TO 30 + NO COMMAS
+
+Upload and replace these FIVE files in your existing GitHub repository:
+index.html
+worker.js
+kernels.json
+kernels_fine.bin
+kernels_mesh.bin
+
+All must come from this update. Do not retain the old binary tables.
+No GitHub Pages settings need changing. Refresh after deployment.
+The time/progress bar and Cancel button are retained. No oscillation plots.
+Numbers display as whole integers without grouping commas.
+The calculation is still approximate, not certified to the nearest integer.

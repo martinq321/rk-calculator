@@ -17,7 +17,7 @@ import json
 from pathlib import Path
 from functools import lru_cache
 import numpy as np
-from scipy.special import zetac
+from scipy.special import zetac, expit
 
 
 def _integer(value, name, lo, hi):
@@ -66,6 +66,29 @@ def riemann_R(x):
     return float(total) if total.ndim == 0 else total
 
 
+# Taylor coefficients of epsilon*zeta(1+epsilon) = 1 + epsilon*A(epsilon).
+# Keep distances to reciprocal endpoints separately: 1 +/- epsilon may round
+# to 1 in float64, even when log(abs(epsilon)) is still essential at high rank.
+_ZETA_POLE_COEFF = [0.5772156649015329, 0.07281584548367673, -0.00484518159643616, -0.00034230573671722433, 9.689041939447084e-05, -6.6110318108421895e-06, -3.316240908752772e-07, 1.0462094584479188e-07, -8.733218100273798e-09, 9.47827778276236e-11, 5.658421927608708e-11, -6.768689863513697e-12, 3.4921159366720317e-13]
+
+def _log_abs_zeta(arguments, epsilon):
+    result = np.empty_like(arguments)
+    close = np.abs(epsilon) < 0.05
+    if np.any(epsilon[close] == 0):
+        raise ArithmeticError('An endpoint distance was lost.')
+    e = epsilon[close]
+    result[close] = -np.log(np.abs(e)) + np.log1p(
+        e*np.polynomial.polynomial.polyval(e, _ZETA_POLE_COEFF))
+    far = ~close
+    z = zetac(arguments[far])
+    above = arguments[far] > 1.0
+    logs = np.empty_like(z)
+    logs[above] = np.log1p(z[above])
+    logs[~above] = np.log(np.abs(1.0+z[~above]))
+    result[far] = logs
+    return result
+
+
 class RealCutRk:
     """Cache a finite-cut quadrature once, then reuse it for many x values.
 
@@ -74,46 +97,48 @@ class RealCutRk:
     cutoff or larger (45 by default). These are convergence controls, NOT
     significant-digit guarantees. Results can be poor at large k or x.
     """
-    def __init__(self, kmax=3, Q=64, h=0.10, cutoff=45.0, umax=3.15):
-        self.kmax = _integer(kmax, 'kmax', 1, 12)
+    def __init__(self, kmax=3, Q=64, h=0.10, cutoff=45.0, umax=5.0):
+        self.kmax = _integer(kmax, 'kmax', 1, 30)
         self.Q = _integer(Q, 'Q', 8, 256)
         self.h, self.cutoff, self.umax = float(h), float(cutoff), float(umax)
         if not 0.025 <= self.h <= 0.20:
             raise ValueError('Use 0.025 <= h <= 0.20.')
-        if not 30 <= self.cutoff <= 60 or not 2.8 <= self.umax <= 3.2:
-            raise ValueError('Use 30 <= cutoff <= 60 and 2.8 <= umax <= 3.2.')
+        if not 30 <= self.cutoff <= 60 or not 4.0 <= self.umax <= 5.5:
+            raise ValueError('Use 30 <= cutoff <= 60 and 4.0 <= umax <= 5.5.')
         M = int(math.ceil(self.cutoff*(self.Q+1)))+1
         mu = mobius_table(M)
         B = np.r_[0.0, np.cumsum(mu[1:]/np.arange(1,M+1))]
         u = np.arange(-int(self.umax/self.h), int(self.umax/self.h)+1)*self.h
         v = (math.pi/2)*np.sinh(u)
-        nodes = np.tanh(v)
-        jac = (math.pi/2)*np.cosh(u)/np.cosh(v)**2
+        # Stable tanh-sinh endpoint distances, retained even when sigma
+        # itself rounds to its interval endpoint. Extended tails are necessary
+        # for the higher powers of log(distance) in ranks up to 30.
+        left_fraction = expit(2*v)
+        right_fraction = expit(-2*v)
+        jac = 2*math.pi*np.cosh(u)*left_fraction*right_fraction
         sigmas, weights, cells = [], [], []
         for q in range(1, self.Q+1):
             lo, hi = 1.0/(q+1), 1.0/q
             half = (hi-lo)/2
-            sig = (hi+lo)/2 + half*nodes
-            keep = (sig>lo) & (sig<hi)
-            sig, ds = sig[keep], (self.h*half*jac)[keep]
+            distance_lo = (hi-lo)*left_fraction
+            distance_hi = (hi-lo)*right_fraction
+            sig = np.where(u<0, lo+distance_lo, hi-distance_hi)
+            ds = self.h*half*jac
             prime_zeta = []
             for m in range(1, self.kmax+1):
                 nmax = int(math.ceil(self.cutoff/(m*lo)))
                 ns = np.nonzero(mu[1:nmax+1])[0]+1
-                arguments = (m*ns[:,None])*sig[None,:]
-                # Never evaluate a rounded node exactly at a reciprocal pole.
-                keep = ~np.any(arguments == 1.0, axis=0)
-                if not np.all(keep):
-                    sig, ds = sig[keep], ds[keep]
-                    prime_zeta = [p[keep] for p in prime_zeta]
-                    arguments = arguments[:,keep]
-                z = zetac(arguments)
-                logs = np.empty_like(z)
-                above = arguments>1.0
-                logs[above] = np.log1p(z[above])
-                logs[~above] = np.log(np.abs(1.0+z[~above]))
-                real_part = np.sum((mu[ns]/ns)[:,None]*logs, axis=0)
-                bank_jump = math.pi*B[np.floor(1.0/(m*sig)).astype(int)]
+                factors = m*ns
+                arguments = factors[:,None]*sig[None,:]
+                epsilon = arguments-1.0
+                # Exact signed distances at this cell's two possible poles.
+                epsilon[factors==q,:] = -q*distance_hi
+                epsilon[factors==q+1,:] = (q+1)*distance_lo
+                logs = _log_abs_zeta(arguments,epsilon)
+                real_part = np.sum((mu[ns]/ns)[:,None]*logs,axis=0)
+                # floor(1/(m*sigma)) is exactly floor(q/m) in this open cell.
+                # Do not infer the side of a pole from rounded sigma values.
+                bank_jump = math.pi*B[q//m]
                 prime_zeta.append(real_part + 1j*bank_jump)
             # If exp(sum_m P(m*s)*z**m/m)=sum_n f_n*z**n,
             # n*f_n=sum_(m=1)^n P(m*s)*f_(n-m).
@@ -152,7 +177,7 @@ class RealCutRk:
     def metadata(self):
         return {'method':'finite positive real-cut quadrature; Gram series for rank 1',
                 'Q':self.Q,'sigma_min':1.0/(self.Q+1),'h':self.h,
-                'mobius_cutoff_product':self.cutoff,'umax':self.umax,
+                'mobius_cutoff_product':self.cutoff,'umax':self.umax,'endpoint_distances':'retained separately with local zeta regularization',
                 'kmax':self.kmax,'nodes':int(len(self.sigma)),
                 'arithmetic':'IEEE float64','certified_full_Rk':False,
                 'warning':'For k>=2 the lower cut is omitted. Sensitivity is not an error bound.'}
@@ -165,7 +190,7 @@ def _cached_engine(kmax, Q, h, cutoff):
 
 def rk_report(k, x, Q=64):
     """Compare Q and 2Q, then halve the integration mesh. NOT a certificate."""
-    k = _integer(k,'k',1,12)
+    k = _integer(k,'k',1,30)
     Q = _integer(Q,'Q',8,128)
     x = float(x)
     if not 1<x<=1e300:
@@ -187,7 +212,7 @@ def rk_report(k, x, Q=64):
 def exact_counts(xmax, kmax=3):
     """Exact N_k(n), factors counted WITH multiplicity, for all n<=xmax."""
     xmax=_integer(xmax,'xmax',2,2000000)
-    kmax=_integer(kmax,'kmax',1,20)
+    kmax=_integer(kmax,'kmax',1,30)
     prime=np.ones(xmax+1,dtype=bool); prime[:2]=False
     for p in range(2,math.isqrt(xmax)+1):
         if prime[p]: prime[p*p::p]=False

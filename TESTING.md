@@ -1,52 +1,54 @@
-# Validation for large-input / progress revision
+# Checks for ranks30-ungrouped-20261106-v1
 
-## Executed
+## Executed functional checks
 
-- JavaScript syntax checks for the worker and page script.
-- Chromium UI/worker tests using Playwright. The environment blocks top-level URL
-  navigation; the page was rendered from its actual HTML and the unchanged worker
-  body ran in a Blob with only a relative-fetch origin shim. Its kernel data came
-  from a real local HTTP server. This was not a live GitHub Pages deployment test.
-- Successful browser calculations for 10^100, 1e100, 10**100, 1,000,000, 10^300,
-  a small-x example and a near-one input, covering ranks 1, 2, 3 and 6.
-- Seven malformed or out-of-range inputs rejected.
-- Progress event percentages were monotone, and completed jobs displayed 100%.
-- Slow HTTP data transfer exercised the progress bar, elapsed timer, cancellation
-  and restart. The transfer throttle was test-only, not an artificial UI wait.
-- Missing-kernel download was reported; retry succeeded after the file returned.
-- 390-pixel mobile viewport had no horizontal overflow.
-- No JavaScript page errors during the test suite.
-- Updated native C++ source compiled with g++ and ran at 1e100 and 1e300.
-- Updated Python module executed, including rank 1 and rank 2 at 1e100 and the
-  precomputed-kernel vector evaluation through 1e300.
+- Rebuilt BOTH binary quadrature tables for ranks 1..30.
+- JavaScript syntax checks passed for the page and worker.
+- Chromium tests: 120 actual-worker calculations, every rank 1..30 at
+  x=2, 10^6, 10^100 and 10^300, all produced finite numerical results.
+- UI checks covered ranks 2, 7, 15 and 30 and 10^100 / 10^300 inputs.
+- Output and exact-count comparison have no comma separators.
+- Rank 31 is rejected by form validation.
+- Progress events were monotone; successful jobs displayed 100%.
+- Cancellation terminated the running worker; a subsequent calculation succeeded.
+- A 390-pixel mobile layout showed no horizontal overflow.
+- No JavaScript page errors were recorded.
+- The C++ source compiled and ran with k=30, x=1e100, agreeing with the browser.
+- The Python module and a further h=.025 quadrature were executed.
 
-## Numerical comparisons
+Browser environment limitation: top-level HTTP navigation is blocked by the
+runtime. The tests rendered the unchanged page HTML with set_content and used
+the unchanged worker body in a Blob. A test-only fetch wrapper resolved relative
+paths to a local HTTP server. This was not a live GitHub Pages deployment test.
+A delay in the test-only fetch wrapper allowed cancellation to be exercised;
+no artificial delay is included in the shipped calculator.
 
-Browser finite-cut rank 2 at x=10^100:
-    2.4821610977539666e98
+## Numerical consistency checks
 
-An independent 40-decimal calculation of the dominant upper real cut gave
-    R2_upper / x = 0.0248216109775449363773354331019467796145
-It used direct Mobius/zeta boundary values through n=150 and separated the
-logarithmic endpoint singularity before quadrature. The browser comparison is
-about 2.13e-13 in relative terms. This is a numerical consistency check, not a
-rigorous enclosure of omitted intervals, quadrature or all error sources.
+The old |u|<=3.15 endpoint coverage was inadequate for high-rank log powers.
+The rebuilt tables retain pole distances even when sigma rounds to an endpoint
+and extend |u| to 5. Both meshes share this handling.
 
-Rank-one values were compared with mpmath's Riemann-R evaluator at 45 decimal
-working precision. Browser/Python comparisons agreed within 5e-12 relative in
-these tests. The figure is a test tolerance, not a certified uniform error bound.
+Additional h=.05 versus h=.025 checks covered k=2,6,10,15,20,25,30 at
+x=2, 10^4, 10^6, 10^10, 10^30, 10^100, 10^300. At k=30 and x=10^100,
+the relative change was about 2.34e-9. At k=30 and x=10^6 the absolute
+change was about 1.12e-11. These are observed changes, NOT error bounds.
+A change smaller than 0.5 does NOT certify integer rounding.
 
-The integer output at x=10^6, k=2 remains 209,965, with exact count 210,035.
+The browser value for k=30, x=10^100 was about 7.676912979e92.
+For k=2, x=10^6 the integer display is 209965, and N_2(10^6)=210035.
 
-Both kernel .bin files are byte-for-byte unchanged from the previous package.
-The new algorithm sums scaled exponentials; no new approximation coefficients
-are fitted to the example inputs.
+The regularized log|zeta(1+epsilon)| was compared with 160-decimal mpmath
+calculations for epsilon of both signs and magnitudes 0.049, 1e-5, 1e-20 and
+1e-80; the converted float64 results agreed in these tests.
 
-## Not claimed
+Full tables of results: browser_validation.json and numerical_validation.json.
 
-- No complete lower-cut enclosure or correctly rounded full-Rk certificate.
-- No promise of uniform accuracy for every supported k and x.
-- No meaningful determination of a huge result's units digit.
-- No execution in a Sage kernel or the public SageMathCell service in this turn.
-- No WebAssembly compilation in this turn.
-- No remote GitHub deployment or live-site update performed here.
+## Not established
+
+- No complete lower-cut enclosure or correctly rounded full-R_k certificate.
+- No uniform high-rank accuracy guarantee; cancellation can be important.
+- No validated units digit for large displayed integers.
+- No independent proof of correctness from numerical refinement alone.
+- No execution in Sage or the public SageMathCell service for this revision.
+- No WebAssembly build or live GitHub deployment performed in this revision.

@@ -5,7 +5,7 @@
 [hidden]{display:none!important}.secondary{background:#e8edf3;color:var(--blue);border:1px solid #cbd7e2;padding:14px 20px}.progressbox{margin:14px 0 22px;padding:17px 18px;background:#f5f8fb;border:1px solid #dce5ef;border-radius:8px}.progresshead,.timerow{display:flex;justify-content:space-between;gap:15px;align-items:center}.progresshead{font-size:13px;margin-bottom:8px}.progresshead strong{font-variant-numeric:tabular-nums;color:var(--blue)}progress{display:block;width:100%;height:9px;appearance:none;border:none;border-radius:8px;overflow:hidden;background:#dde6ef}progress::-webkit-progress-bar{background:#dde6ef;border-radius:8px}progress::-webkit-progress-value{background:var(--blue);border-radius:8px}progress::-moz-progress-bar{background:var(--blue);border-radius:8px}.timerow{margin-top:8px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}.number.big{font-size:23px;font-variant-numeric:tabular-nums;line-height:1.6;max-width:100%;word-break:normal;overflow-wrap:anywhere}.scientific{margin-top:10px;font:23px/1.5 Georgia,serif;color:var(--blue)}.metric strong{overflow-wrap:anywhere}.metric small{display:block;margin-top:7px;color:var(--muted);font-size:11px}.metric{min-width:0}input:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:3px}@media(max-width:640px){.timerow{align-items:flex-start;flex-direction:column;gap:2px}.progresshead{align-items:flex-start}.number.big{font-size:19px}.scientific{font-size:19px}}
 </style></head><body><main>
 <header><div class="eyebrow">Almost primes / numerical calculator</div><h1>Riemann functions for almost primes</h1><p class="intro">Evaluate the real-cut functions R<sub>k</sub>(x), with k counting prime factors <em>with multiplicity</em>. Enter a rank and a real x; the calculation runs in your browser.</p><span class="badge">EXPLORATORY — NOT CERTIFIED</span></header>
-<section class="card"><h2>Calculate R<sub>k</sub>(x)</h2><form id="form"><div class="inputrow"><div class="rank"><label for="k">Rank k</label><input type="number" id="k" min="1" max="6" step="1" value="2" required></div><div class="xinput"><label for="x">Value of x</label><input id="x" value="1000000" inputmode="text" required aria-describedby="inputhelp"></div><button id="run" type="submit">Calculate</button><button id="cancel" class="secondary" type="button" hidden>Cancel</button></div><p class="help" id="inputhelp">k = 1…6; 1 &lt; x ≤ 10³⁰⁰. Accepts 1000000, 1e100 or 10^100. Large results are approximations, not certified integer values.</p></form><p id="status" class="status" role="status" aria-live="polite">Ready. Data load once, on your first calculation.</p>
+<section class="card"><h2>Calculate R<sub>k</sub>(x)</h2><form id="form"><div class="inputrow"><div class="rank"><label for="k">Rank k</label><input type="number" id="k" min="1" max="30" step="1" value="2" required></div><div class="xinput"><label for="x">Value of x</label><input id="x" value="1000000" inputmode="text" required aria-describedby="inputhelp"></div><button id="run" type="submit">Calculate</button><button id="cancel" class="secondary" type="button" hidden>Cancel</button></div><p class="help" id="inputhelp">k = 1…30; 1 &lt; x ≤ 10³⁰⁰. Accepts 1000000, 1e100 or 10^100. Large results are approximations, not certified integer values.</p></form><p id="status" class="status" role="status" aria-live="polite">Ready. Data load once, on your first calculation.</p>
 <div id="progressbox" class="progressbox" hidden>
   <div class="progresshead"><span id="stage">Starting</span><strong id="percent">0%</strong></div>
   <progress id="progress" max="100" value="0" aria-label="Calculation progress">0%</progress>
@@ -13,19 +13,19 @@
 </div>
 <div id="result" class="result" hidden><span class="eyebrow" id="resultlabel"></span><div class="number" id="value"></div><div class="scientific" id="scientific" hidden></div>
 <p class="help" id="roundingnote">Rounded numerical approximation; not a certified integer value.</p>
-<p class="note warn" id="largewarning" hidden>At this size, double-precision arithmetic cannot determine the units digit. The full integer is the rounded numerical approximation, not an exact value; its many trailing digits are not reliable.</p><p class="note" id="counts"></p><div class="resultgrid"><div class="metric"><span>Change from 64 to 128 reciprocal cells</span><strong id="cutoff"></strong><small id="cutoffrel"></small></div><div class="metric"><span>Change after halving the integration mesh</span><strong id="mesh"></strong><small id="meshrel"></small></div></div><p class="note warn" id="methodwarning">These changes are sensitivity checks, <strong>not upper error bounds</strong>. For k ≥ 2, the interval 0 &lt; σ &lt; 1/129 is omitted. Rounding the approximation does not certify the correctly rounded value of the full R<sub>k</sub>.</p></div>
-<details><summary>What is being evaluated?</summary><p class="formula">R<sub>k,Q</sub>(x) = ∫<sub>1/(Q+1)</sub><sup>1</sup> Δ<sub>k</sub>(σ) x<sup>σ</sup> dσ / σ</p><p class="note">For k ≥ 2, this is a finite-cut approximation to the complete real-cut definition, not a truncated Selberg asymptotic expansion. The calculator uses Q = 128, tanh–sinh quadrature, a truncated Möbius series for the prime-zeta boundary values, and IEEE double precision. The density and quadrature weights are prepared once; the exponential is evaluated afresh for every input. For large inputs, terms are evaluated as exp((σ − 1) log x) and the final sum is multiplied by x, avoiding excessively large intermediate terms. Each input is evaluated directly using these quadrature weights.</p><p class="note">Rank 1 is evaluated separately by the convergent Gram series for Riemann’s R-function, with a stopping test that also handles large x. For floor(x) ≤ 10⁶, the exact count N<sub>k</sub>(floor(x)) is also computed by a sieve. R<sub>k</sub> is a smooth model and is not itself an exact almost-prime count.</p><p class="note">For rigorous values, use a separately validated interval implementation enclosing quadrature, Möbius truncation and the complete lower cut. This demonstration is not the FLINT/Arb certified hybrid.</p><p class="note">The progress bar follows downloaded data and completed calculation stages, not a simulated delay. Elapsed time is measured in your browser. A remaining-time estimate is shown only when enough download measurements exist; it is approximate. Cached or small calculations may finish almost immediately. Cancel stops the worker immediately.</p></details></section>
+<p class="note warn" id="largewarning" hidden>At this size, double-precision arithmetic cannot determine the units digit. The full integer is the rounded numerical approximation, not an exact value; its many trailing digits are not reliable.</p><p class="note warn" id="rankwarning" hidden>For higher ranks, cancellation and the omitted lower cut can matter substantially, especially at small x. Agreement between numerical settings is not a certificate.</p><p class="note" id="counts"></p><div class="resultgrid"><div class="metric"><span>Change from 64 to 128 reciprocal cells</span><strong id="cutoff"></strong><small id="cutoffrel"></small></div><div class="metric"><span>Change after halving the integration mesh</span><strong id="mesh"></strong><small id="meshrel"></small></div></div><p class="note warn" id="methodwarning">These changes are sensitivity checks, <strong>not upper error bounds</strong>. For k ≥ 2, the interval 0 &lt; σ &lt; 1/129 is omitted. Rounding the approximation does not certify the correctly rounded value of the full R<sub>k</sub>.</p></div>
+<details><summary>What is being evaluated?</summary><p class="formula">R<sub>k,Q</sub>(x) = ∫<sub>1/(Q+1)</sub><sup>1</sup> Δ<sub>k</sub>(σ) x<sup>σ</sup> dσ / σ</p><p class="note">For k ≥ 2, this is a finite-cut approximation to the complete real-cut definition, not a truncated Selberg asymptotic expansion. The calculator uses Q = 128, tanh–sinh quadrature, a truncated Möbius series for the prime-zeta boundary values, and IEEE double precision. The quadrature retains distances to singular endpoints separately and extends its endpoint tails for ranks up to 30. The density and quadrature weights are prepared once; the exponential is evaluated afresh for every input. For large inputs, terms are evaluated as exp((σ − 1) log x) and the final sum is multiplied by x, avoiding excessively large intermediate terms. Each input is evaluated directly using these quadrature weights.</p><p class="note">Rank 1 is evaluated separately by the convergent Gram series for Riemann’s R-function, with a stopping test that also handles large x. For floor(x) ≤ 10⁶, the exact count N<sub>k</sub>(floor(x)) is also computed by a sieve. R<sub>k</sub> is a smooth model and is not itself an exact almost-prime count.</p><p class="note">For rigorous values, use a separately validated interval implementation enclosing quadrature, Möbius truncation and the complete lower cut. This demonstration is not the FLINT/Arb certified hybrid.</p><p class="note">The progress bar follows downloaded data and completed calculation stages, not a simulated delay. Elapsed time is measured in your browser. A remaining-time estimate is shown only when enough download measurements exist; it is approximate. Cached or small calculations may finish almost immediately. Cancel stops the worker immediately.</p></details></section>
 <section class="card"><h2>Reproduce and extend</h2><p class="note">The core implementation uses NumPy and SciPy and can be loaded in SageMath. It has been executed in Python; the public SageMathCell service is an optional, separate external service.</p><pre>load("rk_calculator.py")
 report = rk_report(k=2, x=10**6, Q=64)
 print(round(report["value"]))</pre><div class="links"><a href="rk_calculator.py" download>Python / Sage module</a><a href="rk_sagecell.txt" download>Complete Sage cell text</a><a href="sage.html">Open embedded Sage cell</a><a href="rk_native.cpp" download>C++ evaluator</a><a href="README.md">Instructions and limitations</a></div></section>
 <footer>Construction: M. Belton, <a href="https://arxiv.org/abs/2610.11024">A note on Riemann’s R-function and almost primes</a>. Related contour explanation: <a href="https://mathoverflow.net/questions/35927/asymptotic-density-of-k-almost-primes">Lucia’s MathOverflow answer</a>. The online calculator is illustrative, not a proof or numerical certificate.</footer></main>
 <script>
 'use strict';
-const RK_VERSION = 'large-inputs-progress-20261106-v1';
+const RK_VERSION = 'ranks30-ungrouped-20261106-v1';
 const $ = id => document.getElementById(id);
 let worker, serial=0, timer=null, started=0, running=false, lastPercent=0;
 let downloadStarted=null, downloadFirstPercent=null;
-const integerFormat = new Intl.NumberFormat('en-GB', {useGrouping:true, maximumFractionDigits:0});
+const integerFormat = new Intl.NumberFormat('en-GB', {useGrouping:false, maximumFractionDigits:0});
 
 function nearestInteger(value) {
   if (!Number.isFinite(value)) return 'Unavailable';
@@ -110,10 +110,11 @@ function showResult(d) {
   $('status').textContent='Calculated in your browser in '+duration((performance.now()-started)/1000)+'.';
   $('result').hidden=false;
   $('resultlabel').textContent=d.k===1?'R₁(x) · convergent Gram series':'R'+d.k+'(x) · finite-cut numerical approximation';
-  $('value').innerHTML='≈ '+nearestInteger(d.value).replace(/,/g,',<wbr>');
+  $('value').textContent='≈ '+nearestInteger(d.value);
   const large=Math.abs(d.value)>Number.MAX_SAFE_INTEGER;
   $('value').classList.toggle('big',large);
   $('largewarning').hidden=!large;
+  $('rankwarning').hidden=d.k<=6;
   $('scientific').hidden=!large;
   if(large) $('scientific').innerHTML='≈ '+scientificHTML(d.value,9)+' (compact approximation)';
   $('roundingnote').textContent=large
@@ -124,7 +125,7 @@ function showResult(d) {
   $('cutoffrel').innerHTML=relativeHTML(d.cutoffRelative);
   $('meshrel').innerHTML=relativeHTML(d.meshRelative);
   $('counts').textContent=d.count===null
-    ?'Exact-count comparison is available only for floor(x) ≤ 1,000,000.'
+    ?'Exact-count comparison is available only for floor(x) ≤ 1000000.'
     :'Exact N'+d.k+'(floor(x)) = '+integerFormat.format(d.count)+
       '. Model minus count (rounded) ≈ '+nearestInteger(d.value-d.count)+'.';
   $('methodwarning').innerHTML=d.k===1
@@ -139,7 +140,7 @@ function getWorker() {
     if(d.id!==serial || !running) return;
     if(d.version!==RK_VERSION) {
       finishProgress('Calculator files do not match',false);
-      $('status').textContent='Please replace both index.html and worker.js, then refresh with Ctrl+F5.';
+      $('status').textContent='Please replace index.html, worker.js, kernels.json and BOTH .bin files from the same update, then refresh.';
       worker.terminate();worker=undefined;return;
     }
     if(d.type==='progress') {showProgress(d);return;}
@@ -160,8 +161,8 @@ function getWorker() {
 $('form').addEventListener('submit',event=>{
   event.preventDefault(); if(running)return;
   const k=Number($('k').value), x=parseX($('x').value);
-  if(!Number.isInteger(k)||k<1||k>6||!Number.isFinite(x)||x<=1||x>1e300) {
-    $('status').textContent='Use integer k = 1…6 and 1 < x ≤ 10^300, for example 10^100 or 1e100.';
+  if(!Number.isInteger(k)||k<1||k>30||!Number.isFinite(x)||x<=1||x>1e300) {
+    $('status').textContent='Use integer k = 1…30 and 1 < x ≤ 10^300, for example 10^100 or 1e100.';
     $('result').hidden=true;return;
   }
   beginProgress();$('status').textContent='Loading data / calculating…';

@@ -23,7 +23,7 @@ static std::vector<double> load_kernel(const std::string& file, std::size_t n) {
 static double dot(const std::vector<double>& a,std::size_t n,int k,double x,double lo=0,bool below=false) {
     double sum=0, correction=0, logx=std::log(x);
     for(std::size_t i=0;i<n;++i) {
-        if(below ? a[i]>lo : a[i]<=lo) continue;
+        if(below ? i<n/2 : a[i]<lo) continue;
         double term=std::exp(logx*(a[i]-1.0))*a[std::size_t(k)*n+i];
         double y=term-correction, t=sum+y;
         correction=(t-sum)-y; sum=t;
@@ -42,7 +42,7 @@ static double riemann_r(double x) {
 }
 int main(int argc,char**argv) {
     try {
-        if(argc!=3) {std::cerr<<"Usage: rk_native k x (k=1..6, 1<x<=1e300)\n";return 1;}
+        if(argc!=3) {std::cerr<<"Usage: rk_native k x (k=1..30, 1<x<=1e300)\n";return 1;}
         std::size_t pos=0;
         int k=std::stoi(argv[1],&pos); if(pos!=std::string(argv[1]).size()) throw std::runtime_error("Invalid k");
         double x=std::stod(argv[2],&pos); if(pos!=std::string(argv[2]).size()) throw std::runtime_error("Invalid x");

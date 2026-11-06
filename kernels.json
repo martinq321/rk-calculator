@@ -5,14 +5,17 @@
     "sigma_min": 0.007751937984496124,
     "h": 0.05,
     "mobius_cutoff_product": 45.0,
-    "umax": 3.15,
-    "kmax": 6,
-    "nodes": 15642,
+    "umax": 5.0,
+    "endpoint_distances": "retained separately with local zeta regularization",
+    "kmax": 30,
+    "nodes": 25728,
     "arithmetic": "IEEE float64",
     "certified_full_Rk": false,
     "warning": "For k>=2 the lower cut is omitted. Sensitivity is not an error bound.",
     "file": "kernels_fine.bin",
-    "sha256": "9295f425d9946c62b53a6d58919e463047a0d7c4215eb6f1c3b08daaf434ea73"
+    "sha256": "7d2f58454b735e67260ca040ffc30bf15dcdfc974a928a8569e13a16800d7e09",
+    "nodes_per_cell": 201,
+    "cutoff_start_index": 12864
   },
   "mesh": {
     "method": "finite positive real-cut quadrature; Gram series for rank 1",
@@ -20,14 +23,17 @@
     "sigma_min": 0.007751937984496124,
     "h": 0.1,
     "mobius_cutoff_product": 45.0,
-    "umax": 3.15,
-    "kmax": 6,
-    "nodes": 7847,
+    "umax": 5.0,
+    "endpoint_distances": "retained separately with local zeta regularization",
+    "kmax": 30,
+    "nodes": 12928,
     "arithmetic": "IEEE float64",
     "certified_full_Rk": false,
     "warning": "For k>=2 the lower cut is omitted. Sensitivity is not an error bound.",
     "file": "kernels_mesh.bin",
-    "sha256": "e209fa4b7afbb0a456496c1565e0b108a3749c3b93af1d7992cff3c2de606a5a"
+    "sha256": "9c69048e1f9b733df388ed0d5ef39d208bb4c15bcaa10a0c6021238a3e14a35d",
+    "nodes_per_cell": 101,
+    "cutoff_start_index": 6464
   },
   "gram_denominators": [
     1.6449340668482264,
@@ -233,10 +239,10 @@
   ],
   "bounds": {
     "k_min": 1,
-    "k_max": 6,
+    "k_max": 30,
     "x_min_exclusive": 1,
     "x_max": 1e+300
   },
-  "browser_revision": "large-inputs-progress-20261106-v1",
-  "large_input_note": "Scaled summation supports 1 < x <= 1e300; not arbitrary precision or a correctly-rounded Rk certificate. Gram denominators beyond the saved table use zeta(n+1)=1 at float64 resolution."
+  "browser_revision": "ranks30-ungrouped-20261106-v1",
+  "large_input_note": "Scaled summation supports 1 < x <= 1e300 and ranks 1..30; not arbitrary precision or a correctly-rounded Rk certificate. High-rank cancellation and endpoint effects can be severe."
 }
