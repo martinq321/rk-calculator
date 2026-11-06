@@ -1,0 +1,15 @@
+LOCAL SAGE SESSION (download rk_calculator.py into the working directory):
+
+load("rk_calculator.py")
+print(rk_report(k=2, x=10**6, Q=64))
+
+# Make both thin-line colour plots and export their exact-count/numerical data:
+export_demo(outdir="rk_demo", xmax=10**6, step=100, Q=128, h=0.05, show=True)
+
+PUBLIC SAGEMATHCELL:
+Paste the complete contents of rk_sagecell.txt, then edit the k and x call near
+its end. The code includes its implementation, so no user-specific path is needed.
+
+The numerical core has been tested in Python; no Sage kernel was available in
+the authoring environment. For k>=2 it is finite-cut, double-precision numerical
+quadrature, not a certified evaluation of full R_k.

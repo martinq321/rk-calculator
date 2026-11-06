@@ -1,0 +1,13 @@
+{
+  "method": "finite positive real-cut quadrature; Gram series for rank 1",
+  "Q": 128,
+  "sigma_min": 0.007751937984496124,
+  "h": 0.05,
+  "mobius_cutoff_product": 45.0,
+  "umax": 3.15,
+  "kmax": 3,
+  "nodes": 15643,
+  "arithmetic": "IEEE float64",
+  "certified_full_Rk": false,
+  "warning": "For k>=2 the lower cut is omitted. Sensitivity is not an error bound."
+}

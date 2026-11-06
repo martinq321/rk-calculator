@@ -1,0 +1,90 @@
+{
+  "status": "sensitivity checks only; NOT a full real-cut certificate",
+  "grid_points": 10001,
+  "x_min": 10.0,
+  "x_max": 1000000.0,
+  "cutoffs": [
+    64,
+    128,
+    256
+  ],
+  "rank1_method": "convergent Gram series",
+  "ranks2_3_method": "finite real-cut quadrature",
+  "mobius_1_through_1000_matches_sympy": true,
+  "gram_vs_mpmath": [
+    {
+      "x": 2,
+      "absolute_difference": 2.6906495236265766e-16
+    },
+    {
+      "x": 15,
+      "absolute_difference": 6.82905916320615e-16
+    },
+    {
+      "x": 100,
+      "absolute_difference": 5.1862961832050635e-15
+    },
+    {
+      "x": 10000,
+      "absolute_difference": 6.754029363692363e-13
+    },
+    {
+      "x": 1000000,
+      "absolute_difference": 1.4476568484737394e-11
+    }
+  ],
+  "small_exact_counts_independently_factored": true,
+  "counts_at_1e6": {
+    "1": 78498,
+    "2": 210035,
+    "3": 250853
+  },
+  "mesh_change_max_abs": [
+    7.275957614183426e-12,
+    4.802132025361061e-09,
+    5.8353180065751076e-08
+  ],
+  "Q64_to_Q128_max_abs": [
+    7.275957614183426e-12,
+    0.0007881447963882238,
+    0.0020898241782560945
+  ],
+  "Q128_to_Q256_max_abs": [
+    7.275957614183426e-12,
+    0.0005289259424898773,
+    0.0014372430741786957
+  ],
+  "mobius_cutoff36_to45_probe_max_abs": [
+    0.0,
+    3.552713678800501e-14,
+    4.547473508864641e-13
+  ],
+  "R1_cut_integral_minus_full_Gram_probes": [
+    0.0005246333326736075,
+    0.0005382689470341262,
+    0.0005514117443503608,
+    0.0005845815674092592,
+    0.0006196187605382875
+  ],
+  "finite_grid_diagnostics": [
+    {
+      "k": 1,
+      "correlation": 0.9314214760461762,
+      "RMS_residual": 16.29555782771239,
+      "RMS_target": 32.11644184187477,
+      "note": "uniform x-grid, not the logarithmic mean square in the theorem"
+    },
+    {
+      "k": 2,
+      "correlation": 0.9150891700339818,
+      "RMS_residual": 22.48409212104963,
+      "RMS_target": 46.814423577702804,
+      "note": "uniform x-grid, not the logarithmic mean square in the theorem"
+    }
+  ],
+  "at_1e6": {
+    "R1": 78527.39942912769,
+    "R2_Q128": 209964.9556594177,
+    "R3_Q128": 250912.9878871109
+  }
+}

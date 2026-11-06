@@ -1,0 +1,32 @@
+{
+  "mode": "Offline Chromium UI/Worker test with local in-memory fetch responses; live HTTP navigation was blocked by the authoring environment. Not a deployed GitHub Pages test.",
+  "results": [
+    {
+      "k": 2,
+      "x": 1000000,
+      "display": "\u2248 209964.95566",
+      "count": "Exact N2(floor(x)) = 210,035. Corresponding model minus count \u2248 -70.044341.",
+      "cutoff": "0.00078814",
+      "mesh": "3.3760e-9"
+    },
+    {
+      "k": 1,
+      "x": 15,
+      "display": "6.1025409893",
+      "count": "Exact N1(floor(x)) = 6. Corresponding model minus count \u2248 0.10254099."
+    },
+    {
+      "k": 6,
+      "x": 1000000,
+      "display": "\u2248 68960.699266",
+      "count": "Exact N6(floor(x)) = 68,963. Corresponding model minus count \u2248 -2.3007343."
+    },
+    {
+      "invalid_x_status": "Use integer k = 1\u20266 and 1 < x \u2264 10\u00b9\u00b2."
+    },
+    {
+      "javascript_errors": [],
+      "mobile_horizontal_overflow": false
+    }
+  ]
+}
