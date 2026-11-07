@@ -3,59 +3,121 @@
 :root{--ink:#182938;--muted:#596a75;--line:#dce3e7;--blue:#2455a4;--paper:#fff;--wash:#f4f6f8;--red:#b3472f}*{box-sizing:border-box}body{margin:0;background:var(--wash);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.6}main{max-width:1080px;margin:auto;padding:46px 26px 70px}header{padding:0 0 28px;border-bottom:1px solid var(--line)}.eyebrow{letter-spacing:.17em;text-transform:uppercase;font-size:11px;font-weight:700;color:var(--blue)}h1{font:normal 43px/1.15 Georgia,serif;margin:12px 0 16px}h2{font:normal 26px/1.3 Georgia,serif;margin:0 0 16px}p{margin:10px 0}.intro{font-size:17px;max-width:790px;color:var(--muted)}.badge{font-size:11px;font-weight:700;letter-spacing:.06em;display:inline-block;border:1px solid #e2b19c;color:#8f391f;border-radius:30px;padding:4px 12px;background:#fff8f4}.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:27px;margin-top:26px}.inputrow{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap}label{display:block;font-size:13px;font-weight:650;margin-bottom:6px}input{font:18px Georgia,serif;padding:12px 14px;border:1px solid #bdcbd3;border-radius:6px;width:100%;color:var(--ink)}.rank{width:100px}.xinput{flex:1;min-width:180px}button{border:0;border-radius:6px;background:var(--blue);color:white;font:600 14px system-ui;padding:15px 25px;cursor:pointer}button:disabled{opacity:.65;cursor:wait}.help{font-size:12px;color:var(--muted)}.status{font-size:13px;min-height:23px;color:var(--muted);margin:12px 0}.result{border-top:1px solid var(--line);padding-top:20px}.number{font:34px/1.3 Georgia,serif;overflow-wrap:anywhere}.resultgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px}.metric{padding:15px;background:var(--wash);border-radius:7px}.metric span{display:block;font-size:12px;color:var(--muted)}.metric strong{font-weight:550;font-size:17px}.note{font-size:13px;max-width:870px;color:var(--muted)}.warn{border-left:3px solid #c4794f;padding-left:14px;color:#764222}details{margin-top:20px}summary{cursor:pointer;font-weight:600}pre{overflow-x:auto;background:#f3f5f7;border:1px solid var(--line);border-radius:6px;padding:15px;line-height:1.55;font-size:13px}a{color:var(--blue)}.links{font-size:13px;display:flex;gap:18px;flex-wrap:wrap}.formula{font:20px Georgia,serif;margin:18px 0}footer{color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:22px;margin-top:30px}@media(max-width:640px){main{padding:25px 15px 40px}h1{font-size:33px}.card{padding:20px}.inputrow{gap:12px}.resultgrid{grid-template-columns:1fr}.number{font-size:29px}}
 
 [hidden]{display:none!important}.secondary{background:#e8edf3;color:var(--blue);border:1px solid #cbd7e2;padding:14px 20px}.progressbox{margin:14px 0 22px;padding:17px 18px;background:#f5f8fb;border:1px solid #dce5ef;border-radius:8px}.progresshead,.timerow{display:flex;justify-content:space-between;gap:15px;align-items:center}.progresshead{font-size:13px;margin-bottom:8px}.progresshead strong{font-variant-numeric:tabular-nums;color:var(--blue)}progress{display:block;width:100%;height:9px;appearance:none;border:none;border-radius:8px;overflow:hidden;background:#dde6ef}progress::-webkit-progress-bar{background:#dde6ef;border-radius:8px}progress::-webkit-progress-value{background:var(--blue);border-radius:8px}progress::-moz-progress-bar{background:var(--blue);border-radius:8px}.timerow{margin-top:8px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}.number.big{font-size:23px;font-variant-numeric:tabular-nums;line-height:1.6;max-width:100%;word-break:normal;overflow-wrap:anywhere}.scientific{margin-top:10px;font:23px/1.5 Georgia,serif;color:var(--blue)}.metric strong{overflow-wrap:anywhere}.metric small{display:block;margin-top:7px;color:var(--muted);font-size:11px}.metric{min-width:0}input:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:3px}@media(max-width:640px){.timerow{align-items:flex-start;flex-direction:column;gap:2px}.progresshead{align-items:flex-start}.number.big{font-size:19px}.scientific{font-size:19px}}
+
+.optionsrow{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.displayfield{min-width:240px;flex:0 1 330px}select{font:15px system-ui;color:var(--ink);background:#fff;border:1px solid #bdcbd3;border-radius:6px;padding:10px 12px;width:100%}.accuracyhelp{flex:1;min-width:220px;font-size:12px;color:var(--muted)}.accuracyhelp strong{color:var(--ink)}.accuracyhelp p{margin:3px 0}.certstatus{display:inline-block;background:#fff8f4;border:1px solid #e2b19c;border-radius:5px;padding:3px 9px;font-size:11px;color:#8f391f}.actions{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}.actions button{font-size:12px;padding:9px 14px}select:focus-visible{outline:2px solid var(--blue);outline-offset:3px}.downloadstatus{font-size:12px;color:var(--muted)}@media(max-width:640px){.displayfield{flex:1;min-width:200px}.optionsrow{gap:10px}}
 </style></head><body><main>
 <header><div class="eyebrow">Almost primes / numerical calculator</div><h1>Riemann functions for almost primes</h1><p class="intro">Evaluate the real-cut functions R<sub>k</sub>(x), with k counting prime factors <em>with multiplicity</em>. Enter a rank and a real x; the calculation runs in your browser.</p><span class="badge">EXPLORATORY — NOT CERTIFIED</span></header>
-<section class="card"><h2>Calculate R<sub>k</sub>(x)</h2><form id="form"><div class="inputrow"><div class="rank"><label for="k">Rank k</label><input type="number" id="k" min="1" max="30" step="1" value="2" required></div><div class="xinput"><label for="x">Value of x</label><input id="x" value="1000000" inputmode="text" required aria-describedby="inputhelp"></div><button id="run" type="submit">Calculate</button><button id="cancel" class="secondary" type="button" hidden>Cancel</button></div><p class="help" id="inputhelp">k = 1…30; 1 &lt; x ≤ 10³⁰⁰. Accepts 1000000, 1e100 or 10^100. Large results are approximations, not certified integer values.</p></form><p id="status" class="status" role="status" aria-live="polite">Ready. Data load once, on your first calculation.</p>
+<section class="card"><h2>Calculate R<sub>k</sub>(x)</h2><form id="form"><div class="inputrow"><div class="rank"><label for="k">Rank k</label><input type="number" id="k" min="1" max="30" step="1" value="2" required></div><div class="xinput"><label for="x">Value of x</label><input id="x" value="1000000" inputmode="text" required aria-describedby="inputhelp"></div><button id="run" type="submit">Calculate</button><button id="cancel" class="secondary" type="button" hidden>Cancel</button></div><p class="help" id="inputhelp">k = 1…30; 1 &lt; x ≤ 10³⁰⁰. Accepts 1000000, 1e100 or 10^100. Results use scientific notation when needed, with no comma separators.</p>
+<div class="optionsrow">
+<div class="displayfield"><label for="displaymode">Display precision</label><select id="displaymode" aria-describedby="accuracyhelp">
+<option value="15" selected>Automatic · up to 15 significant figures</option>
+<option value="10">Automatic · up to 10 significant figures</option>
+<option value="6">Automatic · up to 6 significant figures</option>
+</select></div>
+<div class="accuracyhelp" id="accuracyhelp"><span class="certstatus">Estimated precision · not certified</span><p>Fewer digits are shown when the numerical checks suggest instability. These checks cannot guarantee the accuracy of the full R<sub>k</sub>.</p></div>
+</div></form><p id="status" class="status" role="status" aria-live="polite">Ready. Data load once, on your first calculation.</p>
 <div id="progressbox" class="progressbox" hidden>
   <div class="progresshead"><span id="stage">Starting</span><strong id="percent">0%</strong></div>
   <progress id="progress" max="100" value="0" aria-label="Calculation progress">0%</progress>
   <div class="timerow"><span id="elapsed">Elapsed: 0.0 s</span><span id="timingnote">Preparing calculation</span></div>
 </div>
 <div id="result" class="result" hidden><span class="eyebrow" id="resultlabel"></span><div class="number" id="value"></div><div class="scientific" id="scientific" hidden></div>
-<p class="help" id="roundingnote">Rounded numerical approximation; not a certified integer value.</p>
-<p class="note warn" id="largewarning" hidden>At this size, double-precision arithmetic cannot determine the units digit. The full integer is the rounded numerical approximation, not an exact value; its many trailing digits are not reliable.</p><p class="note warn" id="rankwarning" hidden>For higher ranks, cancellation and the omitted lower cut can matter substantially, especially at small x. Agreement between numerical settings is not a certificate.</p><p class="note" id="counts"></p><div class="resultgrid"><div class="metric"><span>Change from 64 to 128 reciprocal cells</span><strong id="cutoff"></strong><small id="cutoffrel"></small></div><div class="metric"><span>Change after halving the integration mesh</span><strong id="mesh"></strong><small id="meshrel"></small></div></div><p class="note warn" id="methodwarning">These changes are sensitivity checks, <strong>not upper error bounds</strong>. For k ≥ 2, the interval 0 &lt; σ &lt; 1/129 is omitted. Rounding the approximation does not certify the correctly rounded value of the full R<sub>k</sub>.</p></div>
+<div class="actions"><button type="button" class="secondary" id="copyvalue">Copy value</button><button type="button" class="secondary" id="downloadresult">Download result</button><span id="downloadstatus" class="downloadstatus" role="status"></span></div>
+<p class="help" id="roundingnote">The display uses an estimated number of significant figures, capped at 15.</p>
+<p class="note warn" id="largewarning" hidden></p><p class="note warn" id="rankwarning" hidden>For higher ranks, cancellation and the omitted lower cut can matter substantially, especially at small x. Agreement between numerical settings is not a certificate.</p><p class="note" id="counts"></p><div class="resultgrid"><div class="metric"><span>Change from 64 to 128 reciprocal cells</span><strong id="cutoff"></strong><small id="cutoffrel"></small></div><div class="metric"><span>Change after halving the integration mesh</span><strong id="mesh"></strong><small id="meshrel"></small></div></div><p class="note warn" id="methodwarning">These changes are sensitivity checks, <strong>not upper error bounds</strong>. For k ≥ 2, the interval 0 &lt; σ &lt; 1/129 is omitted. Rounding the approximation does not certify the correctly rounded value of the full R<sub>k</sub>.</p></div>
+<details><summary>What would certification mean?</summary>
+<p class="note"><strong>Certified 10 significant digits</strong> means a rigorous enclosure establishes those leading digits. <strong>Certified nearest integer</strong> means the enclosure establishes which whole integer the full R<sub>k</sub>(x) rounds to. These are different requests for a large value.</p>
+<p class="note">The current browser worker does neither: it is the fast finite-cut evaluator, not the FLINT/Arb certified hybrid. Leaving it running longer, displaying fewer digits, or agreeing between two numerical settings does not add certification. A validated full-integral backend must be connected before a certified mode can be enabled.</p>
+<p class="note">No certified-runtime estimate is shown here. The elapsed-time bar measures only the calculation that actually runs in this browser.</p>
+</details>
 <details><summary>What is being evaluated?</summary><p class="formula">R<sub>k,Q</sub>(x) = ∫<sub>1/(Q+1)</sub><sup>1</sup> Δ<sub>k</sub>(σ) x<sup>σ</sup> dσ / σ</p><p class="note">For k ≥ 2, this is a finite-cut approximation to the complete real-cut definition, not a truncated Selberg asymptotic expansion. The calculator uses Q = 128, tanh–sinh quadrature, a truncated Möbius series for the prime-zeta boundary values, and IEEE double precision. The quadrature retains distances to singular endpoints separately and extends its endpoint tails for ranks up to 30. The density and quadrature weights are prepared once; the exponential is evaluated afresh for every input. For large inputs, terms are evaluated as exp((σ − 1) log x) and the final sum is multiplied by x, avoiding excessively large intermediate terms. Each input is evaluated directly using these quadrature weights.</p><p class="note">Rank 1 is evaluated separately by the convergent Gram series for Riemann’s R-function, with a stopping test that also handles large x. For floor(x) ≤ 10⁶, the exact count N<sub>k</sub>(floor(x)) is also computed by a sieve. R<sub>k</sub> is a smooth model and is not itself an exact almost-prime count.</p><p class="note">For rigorous values, use a separately validated interval implementation enclosing quadrature, Möbius truncation and the complete lower cut. This demonstration is not the FLINT/Arb certified hybrid.</p><p class="note">The progress bar follows downloaded data and completed calculation stages, not a simulated delay. Elapsed time is measured in your browser. A remaining-time estimate is shown only when enough download measurements exist; it is approximate. Cached or small calculations may finish almost immediately. Cancel stops the worker immediately.</p></details></section>
-<section class="card"><h2>Reproduce and extend</h2><p class="note">The core implementation uses NumPy and SciPy and can be loaded in SageMath. It has been executed in Python; the public SageMathCell service is an optional, separate external service.</p><pre>load("rk_calculator.py")
+<section class="card"><h2>How many digits are shown?</h2><p class="note">The answer is rounded to at most 15 significant figures. Larger values use scientific notation instead of a long integer with unreliable trailing digits. Copy and download use the same rounded value.</p><details><summary>How the automatic display works</summary><p class="note">For ranks 2–30, the display uses ten times the larger of the mesh and cutoff changes, together with a floating-point allowance that increases with cancellation. It then keeps only a number of figures for which the upper and lower trial values round identically. For rank 1, only the floating-point allowance is used because its Gram series is evaluated separately. If even a one-figure result is unstable, the numerical answer is withheld rather than printed with misleading digits.</p><p class="note warn">This is a conservative formatting heuristic, not a rigorous error bound. Both quadratures share an omitted lower cut, finite endpoint coverage and precomputed floating-point coefficients. Agreement can miss shared errors. Even the shortened result is not certified, and a smaller displayed change does not prove correct rounding.</p></details></section><section class="card"><h2>Reproduce and extend</h2><p class="note">The core implementation uses NumPy and SciPy and can be loaded in SageMath. It has been executed in Python; the public SageMathCell service is an optional, separate external service.</p><pre>load("rk_calculator.py")
 report = rk_report(k=2, x=10**6, Q=64)
-print(round(report["value"]))</pre><div class="links"><a href="rk_calculator.py" download>Python / Sage module</a><a href="rk_sagecell.txt" download>Complete Sage cell text</a><a href="sage.html">Open embedded Sage cell</a><a href="rk_native.cpp" download>C++ evaluator</a><a href="README.md">Instructions and limitations</a></div></section>
-<footer>Construction: M. Belton, <a href="https://arxiv.org/abs/2610.11024">A note on Riemann’s R-function and almost primes</a>. Related contour explanation: <a href="https://mathoverflow.net/questions/35927/asymptotic-density-of-k-almost-primes">Lucia’s MathOverflow answer</a>. The online calculator is illustrative, not a proof or numerical certificate.</footer></main>
+print(report["value"])  # approximation, not certified digits</pre><div class="links"><a href="rk_calculator.py" download>Python / Sage module</a><a href="rk_sagecell.txt" download>Complete Sage cell text</a><a href="sage.html">Open embedded Sage cell</a><a href="rk_native.cpp" download>C++ evaluator</a><a href="README.md">Instructions and limitations</a></div></section>
+<footer>Construction: M. Belton, <a href="https://arxiv.org/abs/2610.11024">A note on Riemann’s R-function and almost primes</a>. Related contour explanation: <a href="https://mathoverflow.net/questions/35927/asymptotic-density-of-k-almost-primes">Lucia’s MathOverflow answer</a>. The online calculator is illustrative, not a proof or numerical certificate. Adaptive significant-figure display: 6 November 2026.</footer></main>
 <script>
 'use strict';
 const RK_VERSION = 'ranks30-ungrouped-20261106-v1';
+const UI_REVISION = 'adaptive-significant-figures-20261106-v3';
+let lastResult = null;
 const $ = id => document.getElementById(id);
 let worker, serial=0, timer=null, started=0, running=false, lastPercent=0;
 let downloadStarted=null, downloadFirstPercent=null;
 const integerFormat = new Intl.NumberFormat('en-GB', {useGrouping:false, maximumFractionDigits:0});
 
-function nearestInteger(value) {
-  if (!Number.isFinite(value)) return 'Unavailable';
-  const rounded = Math.sign(value)*Math.round(Math.abs(value));
-  if (rounded === 0) return '0';
-  // BigInt is used ONLY to format the integer represented by the numerical
-  // result. It does not add arithmetic precision or certify any digit.
-  if (Math.abs(rounded)>Number.MAX_SAFE_INTEGER && typeof BigInt==='function') {
-    return integerFormat.format(BigInt(rounded));
+// Display policy only. This does NOT enclose the error in full R_k.
+// Refinement can miss shared errors, especially the omitted lower cut.
+const DISPLAY_MAX_DIGITS = 15;
+const REFINEMENT_GUARD = 10;
+
+function selectedDigitCap() {
+  const requested = Number($('displaymode').value);
+  return Number.isInteger(requested) ? Math.max(1,Math.min(DISPLAY_MAX_DIGITS,requested)) : DISPLAY_MAX_DIGITS;
+}
+
+function roundWithStabilityCheck(value, allowance, cap=DISPLAY_MAX_DIGITS) {
+  if (!Number.isFinite(value) || !Number.isFinite(allowance) || allowance <= 0 || value === 0) {
+    return {digits:0,text:null};
   }
-  return integerFormat.format(rounded);
+  const low=value-allowance, high=value+allowance;
+  if (!Number.isFinite(low) || !Number.isFinite(high) || low<=0 && high>=0) {
+    return {digits:0,text:null};
+  }
+  for (let digits=Math.min(DISPLAY_MAX_DIGITS,cap); digits>=1; --digits) {
+    // Agreement of the rounded endpoints is stronger than simply counting
+    // leading zeroes in a relative-change diagnostic. This is nevertheless
+    // agreement for a HEURISTIC interval, not an interval certificate.
+    if (low.toPrecision(digits)===high.toPrecision(digits)) {
+      return {digits,text:value.toPrecision(digits)};
+    }
+  }
+  return {digits:0,text:null};
 }
-function scientificHTML(value,digits=9) {
-  if (!Number.isFinite(value)) return 'Unavailable';
-  if (value===0) return '0';
-  const [mantissa, exponent]=value.toExponential(digits).split('e');
-  return mantissa + ' × 10<sup>' + String(Number(exponent)) + '</sup>';
+
+function displayAssessment(d,cap=DISPLAY_MAX_DIGITS) {
+  if (!d || !Number.isFinite(d.value) || !Number.isFinite(d.x) || d.x<=1) {
+    return {digits:0,text:null,allowance:null,reason:'No finite numerical result.'};
+  }
+  let observed=0, condition=1;
+  if (d.k!==1) {
+    if (![d.cutoff,d.mesh,d.cancellationRatio].every(Number.isFinite) ||
+        d.cutoff<0 || d.mesh<0 || d.cancellationRatio<0) {
+      return {digits:0,text:null,allowance:null,reason:'The precision diagnostics are unavailable.'};
+    }
+    observed=Math.max(d.cutoff,d.mesh);
+    condition=Math.max(1,d.cancellationRatio);
+  }
+  // An engineering guard against over-reporting float64 digits. Includes
+  // log(x) in the exponential evaluation and cancellation in the signed sum.
+  // Neither this expression nor ten times a refinement difference is a
+  // proved error bound; both are explicitly described as heuristics in the UI.
+  const fpRelative=8*Number.EPSILON*(1+Math.abs(Math.log(d.x))+d.k)*condition;
+  const fpAllowance=Math.abs(d.value)*fpRelative;
+  const allowance=Math.max(REFINEMENT_GUARD*observed,fpAllowance,Number.MIN_VALUE);
+  const rounded=roundWithStabilityCheck(d.value,allowance,cap);
+  return {...rounded,allowance,observed,fpRelative,cap,
+    reason:rounded.digits ? 'Agreement-based display estimate; not certified.' :
+      'The current settings do not support a stable rounded result.'};
 }
-function sensitivityHTML(value) {
+
+function precisionHTML(text) {
+  if (text===null) return 'No stable rounded result';
+  // text comes only from Number.toPrecision; it contains no user HTML.
+  const parts=text.split('e');
+  return parts.length===1 ? text : parts[0]+' × 10<sup>'+String(Number(parts[1]))+'</sup>';
+}
+function diagnosticHTML(value) {
   if (value===null || value===undefined) return 'Not applicable';
   if (!Number.isFinite(value) || value<0) return 'Unavailable';
   if (value===0) return 'No change resolved';
-  if (value<1) return 'Less than 1';
-  if (value<1e12) return 'About '+nearestInteger(value);
-  return '≈ '+scientificHTML(value,3);
+  return '≈ '+precisionHTML(value.toPrecision(2));
 }
+
 function relativeHTML(value) {
   if (value===null || value===undefined || !Number.isFinite(value)) return '';
   if (value===0) return 'Below the resolution of this check; not a zero-error bound.';
-  return 'Relative change: '+scientificHTML(value,2)+' (not an error bound)';
+  return 'Relative change: '+precisionHTML(value.toPrecision(2))+' (not an error bound)';
 }
 function parseX(text) {
   const s=String(text).trim().replace(/,/g,'');
@@ -108,30 +170,105 @@ function showResult(d) {
   if (!Number.isFinite(d.value)) throw new Error('No finite numerical result was returned.');
   finishProgress('Calculation complete',true);
   $('status').textContent='Calculated in your browser in '+duration((performance.now()-started)/1000)+'.';
+  lastResult=d;
+  $('downloadstatus').textContent='';
   $('result').hidden=false;
   $('resultlabel').textContent=d.k===1?'R₁(x) · convergent Gram series':'R'+d.k+'(x) · finite-cut numerical approximation';
-  $('value').textContent='≈ '+nearestInteger(d.value);
-  const large=Math.abs(d.value)>Number.MAX_SAFE_INTEGER;
-  $('value').classList.toggle('big',large);
-  $('largewarning').hidden=!large;
   $('rankwarning').hidden=d.k<=6;
-  $('scientific').hidden=!large;
-  if(large) $('scientific').innerHTML='≈ '+scientificHTML(d.value,9)+' (compact approximation)';
-  $('roundingnote').textContent=large
-    ?'Shown as a whole integer, but only the leading digits are numerically meaningful. This is not correctly-rounded arbitrary-precision evaluation.'
-    :'Displayed to the nearest integer; the underlying approximation is not certified.';
-  $('cutoff').innerHTML=sensitivityHTML(d.cutoff);
-  $('mesh').innerHTML=sensitivityHTML(d.mesh);
+  $('cutoff').innerHTML=diagnosticHTML(d.cutoff);
+  $('mesh').innerHTML=diagnosticHTML(d.mesh);
   $('cutoffrel').innerHTML=relativeHTML(d.cutoffRelative);
   $('meshrel').innerHTML=relativeHTML(d.meshRelative);
-  $('counts').textContent=d.count===null
-    ?'Exact-count comparison is available only for floor(x) ≤ 1000000.'
-    :'Exact N'+d.k+'(floor(x)) = '+integerFormat.format(d.count)+
-      '. Model minus count (rounded) ≈ '+nearestInteger(d.value-d.count)+'.';
   $('methodwarning').innerHTML=d.k===1
-    ?'Rank 1 uses the convergent Gram series ('+d.terms+' terms) in double precision. The stopping test is numerical, not an interval certificate.'
-    :'These changes are sensitivity checks, <strong>not upper error bounds</strong>. The interval 0 &lt; σ &lt; 1/129 is omitted. Both meshes also share finite endpoint coverage and double-precision rounding; agreement between them can underestimate the actual error. Rounding the output does not certify the correctly rounded full R<sub>k</sub>.';
+    ?'Rank 1 uses the convergent Gram series ('+d.terms+' terms) in double precision. The displayed figures use a rounding allowance; the numerical stopping test and that allowance are <strong>not an interval certificate</strong>.'
+    :'These changes are sensitivity checks, <strong>not upper error bounds</strong>. The interval 0 &lt; σ &lt; 1/129 is omitted. Both meshes also share finite endpoint coverage and double-precision rounding; agreement can underestimate the actual error. Fewer displayed digits do not certify the full R<sub>k</sub>.';
+  renderMainValue();
 }
+
+function renderedValueText() {
+  if (!lastResult) return '';
+  return displayAssessment(lastResult,selectedDigitCap()).text || 'No stable rounded result';
+}
+function renderMainValue() {
+  if (!lastResult) return;
+  const a=displayAssessment(lastResult,selectedDigitCap());
+  $('value').innerHTML=(a.digits?'≈ ':'')+precisionHTML(a.text);
+  $('value').classList.toggle('big',!a.digits);
+  $('scientific').hidden=true;
+  $('largewarning').hidden=!!a.digits;
+  $('largewarning').textContent=a.reason+' Try a different input or use the rigorous backend. No digits of the full function are being certified here.';
+  $('copyvalue').disabled=!a.digits;
+  $('roundingnote').textContent=a.digits
+    ? a.digits+' significant figure'+(a.digits===1?'':'s')+' shown (estimated), with a maximum of '+a.cap+'. '+
+      (lastResult.k===1?'Chosen using a floating-point allowance; not an accuracy certificate.':
+       'Chosen from mesh/cutoff changes and a cancellation-aware rounding allowance; not an accuracy certificate.')
+    : 'No numerical answer is shown because the display stability check failed. This does not mean R_k is zero.';
+  if (lastResult.count===null) {
+    $('counts').textContent='Exact-count comparison is available only for floor(x) ≤ 1000000.';
+  } else {
+    const delta=lastResult.value-lastResult.count;
+    const error=Number.isFinite(a.allowance)
+      ? a.allowance+8*Number.EPSILON*(Math.abs(lastResult.value)+Math.abs(lastResult.count))
+      : Infinity;
+    const difference=roundWithStabilityCheck(delta,error,selectedDigitCap());
+    $('counts').textContent='Exact N'+lastResult.k+'(floor(x)) = '+integerFormat.format(lastResult.count)+
+      (difference.digits ? '. Model minus count ≈ '+difference.text+' (estimated).' :
+       '. Model minus count is unresolved at the current numerical settings.');
+  }
+}
+$('displaymode').addEventListener('change',()=>{
+  renderMainValue();
+  $('downloadstatus').textContent='';
+});
+$('copyvalue').addEventListener('click',async()=>{
+  if (!lastResult) return;
+  try {
+    if (!navigator.clipboard || !window.isSecureContext) throw new Error('Clipboard unavailable');
+    await navigator.clipboard.writeText(renderedValueText());
+    $('downloadstatus').textContent='Copied approximate value.';
+  } catch(e) {
+    // Keep manual copying available on file:// or browsers without permission.
+    const range=document.createRange();range.selectNodeContents($('value'));
+    const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);
+    $('downloadstatus').textContent='Value selected. Press Ctrl+C or use Copy.';
+  }
+});
+$('downloadresult').addEventListener('click',()=>{
+  if (!lastResult) return;
+  const r=lastResult;
+  const assessment=displayAssessment(r,selectedDigitCap());
+  const text=[
+    'Almost-prime Riemann function: numerical approximation',
+    'k: '+r.k,
+    'x entered: '+r.inputText,
+    'x used (floating point): '+String(r.x),
+    'Displayed value: '+renderedValueText(),
+    'Maximum displayed significant figures: '+selectedDigitCap(),
+    'Significant figures shown (estimated): '+assessment.digits,
+    'Display assessment: '+assessment.reason,
+    'Heuristic allowance, NOT an error bound: '+(Number.isFinite(assessment.allowance)?assessment.allowance.toPrecision(3):'unavailable'),
+    'Certified: NO',
+    'Method: '+(r.k===1?'Gram series in double precision':'Finite positive real-cut quadrature, Q=128, double precision'),
+    'Exact count: '+(r.count===null?'not calculated':String(r.count)),
+    'Cutoff sensitivity (not an error bound): '+(Number.isFinite(r.cutoff)?r.cutoff.toPrecision(3):'not applicable'),
+    'Mesh sensitivity (not an error bound): '+(Number.isFinite(r.mesh)?r.mesh.toPrecision(3):'not applicable'),
+    'Worker elapsed seconds: '+String(r.seconds),
+    'Calculator UI revision: '+UI_REVISION,
+    'Kernel revision: '+RK_VERSION,
+    '',
+    'The display uses 10x the maximum observed refinement change plus a separate floating-point allowance (via their maximum).',
+    'The displayed significant figures are estimated, not guaranteed accurate. Shared truncation and coefficient errors are not enclosed.',
+    r.k===1?'No interval error certificate was computed.':'The interval 0 < sigma < 1/129 is omitted. Mesh and cutoff checks do not enclose the full R_k error.',
+    ''
+  ].join('\n');
+  const blob=new Blob([text],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='rk-'+r.k+'-result.txt';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
+  $('downloadstatus').textContent='Approximate result saved with method and limitations.';
+});
+
 function getWorker() {
   if (worker) return worker;
   worker=new Worker('worker.js?v='+encodeURIComponent(RK_VERSION));
@@ -148,7 +285,7 @@ function getWorker() {
       finishProgress('Calculation stopped',false);$('status').textContent=d.error;return;
     }
     if(d.type==='result') {
-      try {showResult(d);} catch(e) {finishProgress('Display error',false);$('status').textContent=e.message;}
+      try {d.inputText=$('x').value.trim();showResult(d);} catch(e) {finishProgress('Display error',false);$('status').textContent=e.message;}
     }
   };
   worker.onerror=()=>{
